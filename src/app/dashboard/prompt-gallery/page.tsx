@@ -93,9 +93,9 @@ export default function PromptGalleryPage() {
       <main className="flex-1 p-8 ml-64">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-              Prompt Gallery
-            </h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-sussie">
+          Prompt Gallery
+        </h1>
             <p className="text-gray-600 dark:text-zinc-400 mt-1">
               Ready-to-use prompt templates for various tasks
             </p>

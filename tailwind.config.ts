@@ -20,8 +20,9 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+				sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
 				mono: ['var(--font-jetbrains-mono)', 'monospace'],
+				'sussie': ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

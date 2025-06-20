@@ -17,7 +17,7 @@ interface Document {
 function generateDocumentId(): string {
   const timestamp = Date.now().toString(36);
   const randomStr = Math.random().toString(36).substring(2, 8);
-  return `doc_${timestamp}_${randomStr}`;
+  return `doc-${timestamp}-${randomStr}`;
 }
 
 export default function DashboardPage() {
@@ -85,7 +85,7 @@ export default function DashboardPage() {
       lastModified: new Date().toISOString(),
       score: generateScore(''),
     };
-    localStorage.setItem(`document-${newId}`, JSON.stringify(newDoc));
+    localStorage.setItem(`document-${newId}`, '');
     localStorage.setItem(`status-${newId}`, 'active');
     router.push(`/results/${newId}`);
   };
@@ -125,7 +125,7 @@ export default function DashboardPage() {
       <main className="flex-1 p-8 ml-64">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-sussie">
               {currentTab === 'documents' ? 'Documents' : 
                currentTab === 'saved' ? 'Saved Documents' :
                currentTab === 'trash' ? 'Trash' : 'Prompt Gallery'}

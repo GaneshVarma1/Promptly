@@ -67,7 +67,7 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange }: Dash
       <aside className="fixed left-0 top-0 w-64 bg-gray-50 dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-900 flex flex-col justify-between py-6 px-4 h-screen z-50">
         <div>
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Promptly</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-sussie">Promptly</h1>
             <p className="text-sm text-gray-500 dark:text-zinc-400">AI Writing Assistant</p>
           </div>
           <nav className="space-y-1">
@@ -87,7 +87,7 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange }: Dash
     <aside className="fixed left-0 top-0 w-64 bg-gray-50 dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-900 flex flex-col justify-between py-6 px-4 h-screen z-50">
       <div>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Promptly</h1>
+                      <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-sussie">Promptly</h1>
           <p className="text-sm text-gray-500 dark:text-zinc-400">AI Writing Assistant</p>
         </div>
         <nav className="space-y-1">

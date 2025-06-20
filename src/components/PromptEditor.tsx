@@ -125,7 +125,7 @@ const PromptEditor: FC<PromptEditorProps> = ({ initialPrompt = "" }) => {
       {/* Main Editor */}
       <div className="lg:col-span-2 space-y-6">
         <Card className="p-6 bg-black border border-zinc-800 rounded-xl shadow-lg text-white">
-          <h2 className="text-2xl font-bold text-center text-white mb-6">Start crafting your perfect prompt!</h2>
+          <h2 className="text-2xl font-bold text-center text-white mb-6 font-sussie">Start crafting your perfect prompt!</h2>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <Wand2 className="w-5 h-5 text-purple-400" />

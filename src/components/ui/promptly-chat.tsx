@@ -90,7 +90,7 @@ export function PromptlyChat({ onPromptSubmit }: PromptlyChatProps) {
 
     return (
         <div className="flex flex-col items-center justify-center h-full w-full max-w-4xl mx-auto p-4 space-y-6">
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-foreground font-sussie">
                 How can I help you craft the perfect prompt today?
             </h1>
 

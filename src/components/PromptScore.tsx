@@ -28,16 +28,25 @@ export interface PromptScoreProps {
 const PromptScore: FC<PromptScoreProps> = ({ score }) => {
   // Color for score value
   const getScoreColor = (value: number) => {
-    if (value >= 80) return "text-green-600";
-    if (value >= 60) return "text-yellow-600";
-    return "text-red-600";
+    if (value >= 80) return "text-green-600 dark:text-green-400";
+    if (value >= 60) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
   };
 
   // Badge for score value
   const getScoreBadge = (value: number) => {
-    if (value >= 80) return { label: "Excellent", variant: "default" as const, className: "bg-green-500" };
-    if (value >= 60) return { label: "Good", variant: "secondary" as const, className: "bg-yellow-500" };
-    return { label: "Needs Work", variant: "destructive" as const, className: "bg-red-500" };
+    if (value >= 80) return { 
+      label: "Excellent", 
+      className: "bg-green-500 dark:bg-green-600 text-white dark:text-white" 
+    };
+    if (value >= 60) return { 
+      label: "Good", 
+      className: "bg-yellow-500 dark:bg-yellow-600 text-white dark:text-white" 
+    };
+    return { 
+      label: "Needs Work", 
+      className: "bg-red-500 dark:bg-red-600 text-white dark:text-white" 
+    };
   };
 
   // Memoized metrics for performance
@@ -63,22 +72,22 @@ const PromptScore: FC<PromptScoreProps> = ({ score }) => {
   ], [score]);
 
   return (
-    <Card className="p-6 bg-black border border-zinc-800 rounded-xl shadow-lg text-white">
-      <h2 className="text-2xl font-bold text-center text-black dark:text-white mb-6">See how your prompt scores today!</h2>
+    <Card className="p-6 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-lg transition-colors">
+      <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6 font-sussie">See how your prompt scores today!</h2>
       <div className="flex items-center space-x-2 mb-4">
-        <Award className="w-5 h-5 text-purple-500" />
-        <h3 className="font-semibold text-white">Prompt Score</h3>
+        <Award className="w-5 h-5 text-purple-500 dark:text-purple-400" />
+        <h3 className="font-semibold text-gray-900 dark:text-white font-sussie">Prompt Score</h3>
       </div>
       {score.overall > 0 ? (
         <>
           <div className="text-center mb-6">
-            <div className={`text-3xl font-bold ${getScoreColor(score.overall)} mb-2`}>
+            <div className={`text-3xl font-bold ${getScoreColor(score.overall)} mb-2 font-sussie`}>
               {score.overall}%
             </div>
-            <Badge {...getScoreBadge(score.overall)} className="mb-2">
+            <Badge className={`mb-2 ${getScoreBadge(score.overall).className} font-sussie`}>
               {getScoreBadge(score.overall).label}
             </Badge>
-            <p className="text-xs text-slate-500">Overall prompt quality</p>
+            <p className="text-xs text-gray-500 dark:text-zinc-400 font-sussie">Overall prompt quality</p>
           </div>
           <div className="space-y-4">
             {metrics.map((metric) => {
@@ -87,17 +96,17 @@ const PromptScore: FC<PromptScoreProps> = ({ score }) => {
                 <div key={metric.name} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Icon className="w-4 h-4 text-slate-500" />
-                      <span className="text-sm font-medium text-slate-700">
+                      <Icon className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-zinc-300 font-sussie">
                         {metric.name}
                       </span>
                     </div>
-                    <span className={`text-sm font-semibold ${getScoreColor(metric.value)}`}>
+                    <span className={`text-sm font-semibold ${getScoreColor(metric.value)} font-sussie`}>
                       {metric.value}%
                     </span>
                   </div>
                   <Progress value={metric.value} className="h-2" />
-                  <p className="text-xs text-slate-500">{metric.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400 font-sussie">{metric.description}</p>
                 </div>
               );
             })}
@@ -105,8 +114,8 @@ const PromptScore: FC<PromptScoreProps> = ({ score }) => {
         </>
       ) : (
         <div className="text-center py-8">
-          <Award className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">
+          <Award className="w-12 h-12 text-gray-300 dark:text-zinc-600 mx-auto mb-3" />
+          <p className="text-gray-500 dark:text-zinc-400 text-sm font-sussie">
             Your prompt will be scored as you type
           </p>
         </div>

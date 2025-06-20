@@ -8,6 +8,7 @@ import Script from "next/script";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -207,7 +208,7 @@ export default function RootLayout({
           }} />
         </head>
         <body
-          className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
+          className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground font-sussie`}
         >
           <Header />
           {children}

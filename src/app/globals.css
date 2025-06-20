@@ -98,7 +98,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sussie;
+  }
+
+  /* Apply Font Sussie (Inter) to all text elements */
+  h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, label, li, td, th {
+    @apply font-sussie;
   }
 
   /* Hide scrollbars for webkit browsers (Chrome, Safari, Edge) */
