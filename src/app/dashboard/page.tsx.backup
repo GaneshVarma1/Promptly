@@ -1,0 +1,483 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { PlusIcon, Search, FileText, Download, Star, Clock, Trash2, Calendar, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { DashboardSidebar } from '@/components/DashboardSidebar';
+import Link from 'next/link';
+
+interface Document {
+  id: string;
+  title: string;
+  content: string;
+  lastModified: string;
+  score?: number;
+  summary?: string;
+}
+
+const ScoreBadge = ({ score }: { score: number | undefined }) => {
+  if (score === undefined) return null;
+
+  const getScoreColor = () => {
+    if (score >= 85) return 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400';
+    if (score >= 70) return 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400';
+    return 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400';
+  };
+
+  return (
+    <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getScoreColor()}`}>
+      Score: {score}
+    </span>
+  );
+};
+
+function DashboardLoadingSkeleton({ onTabChange }: { onTabChange: (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery') => void }) {
+  return (
+    <div className="flex min-h-screen bg-white dark:bg-black">
+      <DashboardSidebar currentTab={'documents'} onTabChange={onTabChange} />
+      <main className="flex-1 flex items-center justify-center ml-64">
+        <div className="w-8 h-8 border-2 border-gray-300 dark:border-zinc-600 border-t-gray-600 dark:border-t-zinc-300 rounded-full animate-spin" />
+      </main>
+    </div>
+  );
+}
+
+/**
+ * Generate a clean, URL-safe document ID
+ */
+function generateDocumentId(): string {
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substring(2, 8);
+  return `doc_${timestamp}_${randomStr}`;
+}
+
+export default function DashboardPage() {
+  const [search, setSearch] = useState("");
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentTab, setCurrentTab] = useState<'documents' | 'saved' | 'trash' | 'prompt-gallery'>('documents');
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log('Current tab changed to:', currentTab);
+  }, [currentTab]);
+
+  const handleTabChange = (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery') => {
+    console.log('Tab change requested to:', tab);
+    setCurrentTab(tab);
+  };
+
+  // Generate a score based on document content
+  const generateScore = (content: string): number => {
+    if (!content || content.length < 10) return Math.floor(Math.random() * 30) + 40; // 40-70 for short content
+    if (content.length < 100) return Math.floor(Math.random() * 20) + 70; // 70-90 for medium content
+    return Math.floor(Math.random() * 15) + 85; // 85-100 for longer content
+  };
+
+  useEffect(() => {
+    const loadDocuments = () => {
+      const loadedDocs: Document[] = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('document-')) {
+            const value = localStorage.getItem(key);
+            if (value) {
+              try {
+                const doc = JSON.parse(value);
+                if (typeof doc === 'object' && doc !== null && doc.title) {
+                  if (!doc.score) {
+                    doc.score = generateScore(doc.content || '');
+                  }
+                  loadedDocs.push({ ...doc, id: key.replace('document-', '') });
+                } else {
+                  const content = String(doc);
+                  loadedDocs.push({
+                    id: key.replace('document-', ''),
+                    title: content.substring(0, 50) || 'Untitled Document',
+                    content: content,
+                    lastModified: new Date().toISOString(),
+                    score: generateScore(content),
+                  });
+                }
+              } catch (e) {
+                loadedDocs.push({
+                  id: key.replace('document-', ''),
+                  title: value.substring(0, 50) || 'Untitled Document',
+                  content: value,
+                  lastModified: new Date().toISOString(),
+                  score: generateScore(value),
+                });
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading documents:', error);
+      }
+      setDocuments(loadedDocs);
+      setIsLoading(false);
+    };
+
+    // Add a small delay to prevent flash of loading state
+    const timer = setTimeout(loadDocuments, 100);
+    return () => clearTimeout(timer);
+  }, [currentTab]);
+
+  const handleCreateNewDocument = () => {
+    const newId = generateDocumentId();
+    const newDoc: Document = {
+      id: newId,
+      title: 'Untitled Document',
+      content: '',
+      lastModified: new Date().toISOString(),
+      score: generateScore(''),
+    };
+    localStorage.setItem(`document-${newId}`, JSON.stringify(newDoc));
+    localStorage.setItem(`status-${newId}`, 'active');
+    router.push(`/results/${newId}`);
+  };
+
+  const handleDelete = (id: string, permanent = false) => {
+    if (permanent) {
+      localStorage.removeItem(`document-${id}`);
+      localStorage.removeItem(`status-${id}`);
+    } else {
+      localStorage.setItem(`status-${id}`, 'trash');
+    }
+    // Refresh documents
+    setDocuments(documents.filter(d => d.id !== id));
+  };
+
+  const handleSave = (id: string) => {
+    localStorage.setItem(`status-${id}`, 'saved');
+    // Don't filter out - keep in documents list
+  };
+
+  const handleUnsave = (id: string) => {
+    localStorage.setItem(`status-${id}`, 'active');
+    // Don't filter out - keep in documents list
+  };
+  
+  const handleRestore = (id: string) => {
+    localStorage.setItem(`status-${id}`, 'active');
+    // Refresh documents
+    setDocuments(documents.filter(d => d.id !== id));
+  };
+
+  const handleDownloadDocument = (doc: Document) => {
+    const blob = new Blob([doc.content], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${doc.title.replace(/ /g, '_')}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  if (isLoading) {
+    return <DashboardLoadingSkeleton onTabChange={handleTabChange} />;
+  }
+  
+  const filteredDocs = documents
+    .filter(doc => {
+      const status = localStorage.getItem(`status-${doc.id}`) || 'active';
+      if (currentTab === 'documents') return status === 'active' || status === 'saved'; // Show both active and saved
+      if (currentTab === 'saved') return status === 'saved'; // Show only saved
+      if (currentTab === 'trash') return status === 'trash';
+      return false;
+    })
+    .filter(doc => {
+      if (!search) return true;
+      return doc.title.toLowerCase().includes(search.toLowerCase()) || 
+             (doc.summary && doc.summary.toLowerCase().includes(search.toLowerCase())) ||
+             doc.content.toLowerCase().includes(search.toLowerCase());
+    });
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gray-50 dark:bg-zinc-950">
+      <DashboardSidebar currentTab={currentTab} onTabChange={handleTabChange} />
+
+      <main className="flex-1 p-8 ml-64">
+        <motion.div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+              {currentTab === 'documents' ? 'Documents' : 
+               currentTab === 'saved' ? 'Saved Documents' :
+               currentTab === 'trash' ? 'Trash' : 'Prompt Gallery'}
+            </h1>
+            <p className="text-gray-600 dark:text-zinc-400 mt-1">
+              {currentTab === 'documents' ? 'All your documents and saved items' : 
+               currentTab === 'saved' ? 'Your starred documents' :
+               currentTab === 'trash' ? 'Recently deleted documents' : 'Ready-to-use prompt templates'}
+            </p>
+          </motion.div>
+          <motion.div className="flex items-center gap-3">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="relative"
+            >
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" />
+              <input
+                type="text"
+                placeholder="Search documents..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 pr-4 py-2.5 w-80 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm"
+              />
+            </motion.div>
+          </motion.div>
+        </motion.div>
+        
+        <AnimatePresence mode="wait">
+          {filteredDocs.length > 0 && currentTab !== 'prompt-gallery' ? (
+            <motion.div 
+              key="documents"
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            >
+              {filteredDocs.map((doc) => {
+                const status = localStorage.getItem(`status-${doc.id}`) || 'active';
+                const isSaved = status === 'saved';
+                
+                return (
+                  <motion.div 
+                    key={doc.id}
+                    variants={item}
+                    layout
+                    whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                    className="group relative bg-white dark:bg-zinc-900 rounded-lg shadow-sm hover:shadow-md border border-gray-200 dark:border-zinc-800 transition-all duration-300 overflow-hidden flex flex-col h-full"
+                  >
+                    {/* Card Header with Score */}
+                    <motion.div className="p-6 flex-1">
+                      <motion.div className="flex items-start justify-between mb-4">
+                        <motion.div className="flex items-center gap-3">
+                          <motion.div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                            <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </motion.div>
+                          <motion.div className="flex flex-col">
+                            <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">
+                              {new Date(doc.lastModified).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </span>
+                            <ScoreBadge score={doc.score} />
+                          </motion.div>
+                        </motion.div>
+                        {isSaved && (
+                          <div
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            className="w-8 h-8 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center"
+                          >
+                            <Star className="w-4 h-4 text-blue-600 dark:text-blue-400 fill-current" />
+                          </motion.div>
+                        )}
+                      </motion.div>
+                      
+                      {/* Title and Content */}
+                      <motion.div className="mb-4">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 line-clamp-2 leading-tight min-h-[3.5rem]">
+                          {doc.title}
+                        </h3>
+                        
+                        <p className="text-sm text-gray-600 dark:text-zinc-400 line-clamp-3 leading-relaxed min-h-[4.5rem]">
+                          {doc.summary || doc.content.substring(0, 120)}...
+                        </p>
+                      </motion.div>
+                      
+                      {/* Document Stats */}
+                      <motion.div className="flex items-center gap-4 text-xs text-gray-500 dark:text-zinc-500">
+                        <span className="flex items-center gap-1">
+                          <User className="w-3 h-3" />
+                          {doc.content.split(' ').length} words
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(doc.lastModified).toLocaleDateString()}
+                        </span>
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Card Actions - Fixed at bottom */}
+                    <motion.div className="px-6 py-3 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50 mt-auto">
+                      <motion.div className="flex items-center justify-between">
+                        <motion.div className="flex items-center gap-1">
+                          <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={(e) => { e.stopPropagation(); handleDownloadDocument(doc); }}
+                            className="p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
+                            title="Download"
+                          >
+                            <Download className="w-4 h-4" />
+                          </motion.button>
+                          
+                          {currentTab === 'trash' ? (
+                            <>
+                              <motion.button 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={(e) => { e.stopPropagation(); handleRestore(doc.id); }}
+                                className="p-2 text-gray-500 dark:text-zinc-400 hover:text-green-600 dark:hover:text-green-400 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
+                                title="Restore"
+                              >
+                                <Clock className="w-4 h-4" />
+                              </motion.button>
+                              <motion.button 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={(e) => { e.stopPropagation(); handleDelete(doc.id, true); }}
+                                className="p-2 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
+                                title="Delete Permanently"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </motion.button>
+                            </>
+                          ) : (
+                            <>
+                              {!isSaved ? (
+                                <motion.button 
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={(e) => { e.stopPropagation(); handleSave(doc.id); }}
+                                  className="p-2 text-gray-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
+                                  title="Save to favorites"
+                                >
+                                  <Star className="w-4 h-4" />
+                                </motion.button>
+                              ) : (
+                                <motion.button 
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={(e) => { e.stopPropagation(); handleUnsave(doc.id); }}
+                                  className="p-2 text-blue-600 dark:text-blue-400 hover:text-gray-500 dark:hover:text-zinc-400 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
+                                  title="Remove from favorites"
+                                >
+                                  <Star className="w-4 h-4 fill-current" />
+                                </motion.button>
+                              )}
+                              <motion.button 
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={(e) => { e.stopPropagation(); handleDelete(doc.id); }}
+                                className="p-2 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
+                                title="Move to trash"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </motion.button>
+                            </>
+                          )}
+                        </motion.div>
+                        
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Link 
+                            href={`/results/${doc.id}`}
+                            className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                          >
+                            Open
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </Link>
+                        </motion.div>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          ) : (
+            <div
+              key="empty"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="flex flex-col items-center justify-center py-20"
+            >
+              {currentTab === 'prompt-gallery' ? (
+                <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+                  {/* Prompt Gallery Content will go here */}
+                </motion.div>
+              ) : (
+                <>
+                  <div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="w-20 h-20 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center mb-6"
+                  >
+                    <FileText className="w-10 h-10 text-gray-400 dark:text-zinc-500" />
+                  </motion.div>
+                  <h3
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+                  >
+                    {search ? 'No documents found' : 
+                     currentTab === 'documents' ? 'No documents yet' :
+                     currentTab === 'saved' ? 'No saved documents' : 'Trash is empty'}
+                  </h3>
+                  <p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-gray-600 dark:text-zinc-400 mb-8 text-center max-w-md"
+                  >
+                    {search ? 'Try adjusting your search terms' : 
+                     currentTab === 'documents' ? 'Create your first document to get started with AI-powered writing' :
+                     currentTab === 'saved' ? 'Star documents to see them here' : 'Deleted documents will appear here'}
+                  </p>
+                  {!search && currentTab === 'documents' && (
+                    <motion.button 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleCreateNewDocument}
+                      className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <PlusIcon className="w-5 h-5" /> Create Your First Document
+                    </motion.button>
+                  )}
+                </>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+    </motion.div>
+  );
+}
+
+function SidebarLink({ label, icon, href, active, badge }: { label: string; icon: React.ReactNode; href?: string; active?: boolean; badge?: number }) {
+  return (
+    <Link href={href || "#"} legacyBehavior>
+      <a className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${active ? "bg-gradient-to-r from-blue-900 to-zinc-900 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-900"}`}>
+        {icon}
+        <span>{label}</span>
+        {badge && <span className="ml-auto bg-zinc-700 text-white text-xs rounded-full px-2 py-0.5">{badge}</span>}
+      </a>
+    </Link>
+  );
+}
