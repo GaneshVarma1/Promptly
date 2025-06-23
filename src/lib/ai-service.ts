@@ -132,7 +132,6 @@ export class AIAnalysisService {
         processingTime,
         model,
         metadata: {
-          ...result.metadata,
           wordCount: this.countWords(request.text),
           characterCount: request.text.length,
           sentenceCount: this.countSentences(request.text),
@@ -272,10 +271,10 @@ export class AIAnalysisService {
     // If no API key, return mock data for development
     if (!this.config.apiKey) {
       console.log('🔧 Using mock AI response for development');
-      return this.generateFallbackAnalysis(text);
+      return this.generateFallbackAnalysis(text, model);
     }
 
-    const prompt = this.buildAnalysisPrompt(text, options);
+    const prompt = this.buildAnalysisPrompt(text, options, model);
     
     const response = await fetch(`${this.config.baseUrl}/v1/chat/completions`, {
       method: 'POST',
@@ -284,15 +283,15 @@ export class AIAnalysisService {
         'Authorization': `Bearer ${this.config.apiKey}`,
       },
       body: JSON.stringify({
-        model: AI_MODELS[model],
+        model: this.getModelProvider(model),
         messages: [
           {
             role: 'user',
             content: prompt,
           },
         ],
-        max_tokens: 2048,
-        temperature: 0.7,
+        max_tokens: this.getModelConfig(model).maxTokens,
+        temperature: this.getModelConfig(model).temperature,
       }),
       signal: AbortSignal.timeout(this.config.timeout),
     });
@@ -309,14 +308,19 @@ export class AIAnalysisService {
     }
 
     const content = data.choices[0].message.content;
-    const parsed = this.parseAnalysisResponse(content, text);
+    const parsed = this.parseAnalysisResponse(content, text, model);
     this.validateAnalysisResponse(parsed);
     
     return this.adjustScoreForLength(parsed, text);
   }
 
-  private buildAnalysisPrompt(text: string, options: AnalysisOptions): string {
+  private buildAnalysisPrompt(text: string, options: AnalysisOptions, model: ModelType = 'llama-70b'): string {
+    const modelConfig = this.getModelConfig(model);
+    const modelSpecificInstructions = this.getModelSpecificInstructions(model);
+    
     const basePrompt = `
+${modelSpecificInstructions}
+
 Analyze the following prompt and provide a comprehensive analysis in JSON format:
 
 "${text}"
@@ -349,9 +353,25 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
     return basePrompt.trim();
   }
 
+  private getModelSpecificInstructions(model: ModelType): string {
+    const instructions = {
+      'llama-70b': 'You are an expert prompt engineer with deep expertise in large language models. Provide comprehensive, detailed analysis with sophisticated insights.',
+      'llama-8b': 'You are a skilled prompt analyst focused on practical improvements. Provide balanced analysis with actionable recommendations.',
+      'llama-3b': 'You are a helpful prompt assistant. Provide clear, straightforward analysis with simple, easy-to-understand suggestions.',
+      'llama-11b-vision': 'You are a multimodal AI expert specializing in visual and text prompts. Consider both textual clarity and potential visual elements in your analysis.',
+      'exaone-32b': 'You are a methodical prompt evaluator with strong analytical skills. Provide structured, logical analysis with data-driven insights.',
+      'afm-4.5b': 'You are a fast, efficient prompt optimizer. Provide quick, focused analysis with high-impact improvement suggestions.',
+      'mixtral-8x7b': 'You are a creative prompt specialist with expertise in diverse domains. Provide innovative analysis with unique perspectives and creative suggestions.',
+      'dialogpt-medium': 'You are a conversational AI expert. Analyze prompts with focus on dialogue quality, engagement, and conversational flow.'
+    };
+    
+    return instructions[model] || instructions['afm-4.5b'];
+  }
+
   private parseAnalysisResponse(
     content: string, 
-    originalText: string
+    originalText: string,
+    model: ModelType = 'afm-4.5b'
   ): Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'> {
     try {
       // Extract JSON from response (handle cases where AI adds extra text)
@@ -382,7 +402,7 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
       console.error('Failed to parse AI response:', error);
       
       // Return fallback analysis
-      return this.generateFallbackAnalysis(originalText);
+      return this.generateFallbackAnalysis(originalText, model);
     }
   }
 
@@ -425,32 +445,118 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
     };
   }
 
-  private generateFallbackAnalysis(text: string): Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'> {
+  private generateFallbackAnalysis(text: string, model: ModelType = 'afm-4.5b'): Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'> {
     const length = text.length;
     const baseScore = length < 50 ? 60 : length < 200 ? 75 : 85;
     
+    // Model-specific scoring variations
+    const modelMultipliers = {
+      'llama-70b': { clarity: 1.1, context: 1.15, format: 1.1, suggestions: 4 },
+      'llama-8b': { clarity: 1.05, context: 1.1, format: 1.05, suggestions: 3 },
+      'llama-3b': { clarity: 0.95, context: 0.95, format: 0.9, suggestions: 2 },
+      'llama-11b-vision': { clarity: 1.0, context: 1.2, format: 1.1, suggestions: 3 },
+      'exaone-32b': { clarity: 1.08, context: 1.05, format: 1.12, suggestions: 4 },
+      'afm-4.5b': { clarity: 0.9, context: 0.85, format: 0.9, suggestions: 2 },
+      'mixtral-8x7b': { clarity: 1.12, context: 1.1, format: 1.05, suggestions: 5 },
+      'dialogpt-medium': { clarity: 0.95, context: 1.0, format: 0.85, suggestions: 3 }
+    };
+
+    const multiplier = modelMultipliers[model] || modelMultipliers['afm-4.5b'];
+    
+    // Model-specific suggestions
+    const modelSuggestions = {
+      'llama-70b': [
+        'Consider implementing advanced prompt engineering techniques for optimal results',
+        'Leverage sophisticated context framing to enhance AI comprehension',
+        'Incorporate domain-specific terminology for precision',
+        'Structure your request with hierarchical information layers'
+      ],
+      'llama-8b': [
+        'Balance specificity with clarity for effective communication',
+        'Provide structured context to guide AI reasoning',
+        'Use practical examples to illustrate your requirements'
+      ],
+      'llama-3b': [
+        'Keep instructions simple and direct',
+        'Add basic context to help understanding',
+        'Use clear, everyday language'
+      ],
+      'llama-11b-vision': [
+        'Consider visual elements that could enhance your prompt',
+        'Structure information with visual hierarchy in mind',
+        'Include descriptions of visual context when relevant'
+      ],
+      'exaone-32b': [
+        'Organize your prompt with logical structure and clear sequence',
+        'Provide systematic context with methodical approach',
+        'Use analytical frameworks to structure requirements',
+        'Include measurable criteria for evaluation'
+      ],
+      'afm-4.5b': [
+        'Focus on essential information for quick processing',
+        'Use concise, action-oriented language'
+      ],
+      'mixtral-8x7b': [
+        'Explore creative approaches to prompt formulation',
+        'Consider multiple perspectives and domain intersections',
+        'Leverage diverse expertise areas in your request',
+        'Think outside conventional prompting patterns',
+        'Incorporate innovative framing techniques'
+      ],
+      'dialogpt-medium': [
+        'Frame your prompt as a natural conversation',
+        'Consider the conversational flow and engagement',
+        'Use dialogue-friendly language and tone'
+      ]
+    };
+    
+    const suggestions = modelSuggestions[model] || modelSuggestions['afm-4.5b'];
+    
     return {
       score: {
-        clarity: baseScore + Math.random() * 10,
-        context: baseScore + Math.random() * 10,
-        format: baseScore + Math.random() * 10,
-        overall: baseScore + Math.random() * 10,
+        clarity: Math.min(100, Math.round(baseScore * multiplier.clarity + Math.random() * 10)),
+        context: Math.min(100, Math.round(baseScore * multiplier.context + Math.random() * 10)),
+        format: Math.min(100, Math.round(baseScore * multiplier.format + Math.random() * 10)),
+        overall: Math.min(100, Math.round(baseScore * ((multiplier.clarity + multiplier.context + multiplier.format) / 3) + Math.random() * 10)),
       },
-      suggestions: [
-        'Consider adding more specific details to improve clarity',
-        'Provide additional context for better AI understanding',
-      ],
+      suggestions: suggestions.slice(0, multiplier.suggestions),
       improvements: [
-        'Be more specific about desired output format',
+        'Be more specific about expected results',
         'Include relevant background information',
-      ],
+        'Add examples of desired output',
+      ].slice(0, Math.max(2, multiplier.suggestions - 1)),
       rewrites: [
-        `Please provide a detailed analysis of: ${text.substring(0, 100)}...`,
+        `Enhanced prompt: ${text.substring(0, 80)}${text.length > 80 ? '...' : ''} - Please provide detailed analysis with specific examples.`,
+        `${model.includes('dialog') ? 'Conversational approach: ' : model.includes('vision') ? 'Multimodal request: ' : 'Optimized version: '}${text.substring(0, 60)}${text.length > 60 ? '...' : ''}`
       ],
-      tone: 'professional',
-      category: 'general',
-      confidence: 70,
+      tone: model.includes('dialog') ? 'conversational' : model.includes('70b') ? 'professional' : model.includes('mixtral') ? 'creative' : 'practical',
+      category: model.includes('vision') ? 'multimodal' : model.includes('dialog') ? 'conversational' : 'general',
+      confidence: Math.min(100, Math.round(70 * multiplier.clarity)),
     };
+  }
+
+  private getModelProvider(model: ModelType): string {
+    const modelKey = this.getModelKey(model);
+    return AI_MODELS[modelKey]?.provider || AI_MODELS.AFM_4_5B.provider;
+  }
+
+  private getModelConfig(model: ModelType) {
+    const modelKey = this.getModelKey(model);
+    return AI_MODELS[modelKey] || AI_MODELS.AFM_4_5B;
+  }
+
+  private getModelKey(model: ModelType): keyof typeof AI_MODELS {
+    const keyMap: Record<ModelType, keyof typeof AI_MODELS> = {
+      'llama-70b': 'LLAMA_70B',
+      'exaone-32b': 'EXAONE_32B',
+      'afm-4.5b': 'AFM_4_5B',
+      'llama-3b': 'LLAMA_3B',
+      'llama-8b': 'LLAMA_8B',
+      'llama-11b-vision': 'LLAMA_11B_VISION',
+      'mixtral-8x7b': 'MIXTRAL_8X7B',
+      'dialogpt-medium': 'DIALOGPT_MEDIUM'
+    };
+    return keyMap[model] || 'AFM_4_5B';
   }
 
   /**

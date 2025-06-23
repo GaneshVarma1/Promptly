@@ -50,12 +50,12 @@ export default function ResultsPage() {
 
   // Memoized model mapping for better performance
   const modelTypeMapping = useMemo(() => ({
-    'meta-llama/Llama-3.2-3B-Instruct-Turbo': 'afm-4.5b' as ModelType,
-    'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo': 'exaone-32b' as ModelType,
+    'meta-llama/Llama-3.2-3B-Instruct-Turbo': 'llama-3b' as ModelType,
+    'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo': 'llama-8b' as ModelType,
     'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo': 'llama-70b' as ModelType,
-    'mistralai/Mixtral-8x7B-Instruct-v0.1': 'llama-70b' as ModelType,
-    'microsoft/DialoGPT-medium': 'afm-4.5b' as ModelType,
-    'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo': 'afm-4.5b' as ModelType,
+    'mistralai/Mixtral-8x7B-Instruct-v0.1': 'mixtral-8x7b' as ModelType,
+    'microsoft/DialoGPT-medium': 'dialogpt-medium' as ModelType,
+    'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo': 'llama-11b-vision' as ModelType,
   }), []);
 
   // Memoized performance optimization for AI analysis

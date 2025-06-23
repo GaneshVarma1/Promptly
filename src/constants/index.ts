@@ -28,8 +28,8 @@ export const API_CONFIG = {
 export const AI_MODELS = {
   LLAMA_70B: {
     id: 'llama-70b',
-    name: 'Meta Llama 3.3 70B',
-    provider: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
+    name: 'Meta Llama 3.1 70B',
+    provider: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
     maxTokens: 4096,
     temperature: 0.7,
     topP: 0.9,
@@ -50,12 +50,57 @@ export const AI_MODELS = {
     temperature: 0.7,
     topP: 0.9,
   },
+  LLAMA_3B: {
+    id: 'llama-3b',
+    name: 'Llama 3.2 3B',
+    provider: 'meta-llama/Llama-3.2-3B-Instruct-Turbo',
+    maxTokens: 2048,
+    temperature: 0.6,
+    topP: 0.85,
+  },
+  LLAMA_8B: {
+    id: 'llama-8b',
+    name: 'Llama 3.1 8B',
+    provider: 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+    maxTokens: 3072,
+    temperature: 0.65,
+    topP: 0.9,
+  },
+  LLAMA_11B_VISION: {
+    id: 'llama-11b-vision',
+    name: 'Llama 3.2 11B Vision',
+    provider: 'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo',
+    maxTokens: 2048,
+    temperature: 0.7,
+    topP: 0.9,
+  },
+  MIXTRAL_8X7B: {
+    id: 'mixtral-8x7b',
+    name: 'Mixtral 8x7B',
+    provider: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+    maxTokens: 4096,
+    temperature: 0.8,
+    topP: 0.95,
+  },
+  DIALOGPT_MEDIUM: {
+    id: 'dialogpt-medium',
+    name: 'DialoGPT Medium',
+    provider: 'microsoft/DialoGPT-medium',
+    maxTokens: 1024,
+    temperature: 0.9,
+    topP: 0.9,
+  },
 } as const;
 
 export const MODEL_FALLBACKS = {
   'llama-70b': 'exaone-32b',
   'exaone-32b': 'afm-4.5b',
   'afm-4.5b': 'afm-4.5b', // No fallback for smallest model
+  'llama-3b': 'afm-4.5b',
+  'llama-8b': 'exaone-32b', 
+  'llama-11b-vision': 'llama-8b',
+  'mixtral-8x7b': 'llama-70b',
+  'dialogpt-medium': 'llama-3b',
 } as const;
 
 // ============================================================================

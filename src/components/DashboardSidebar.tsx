@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Clock, Trash2, User, Layers, ShieldCheck, Menu } from "lucide-react";
+import { FileText, Clock, Trash2, User, Layers, ShieldCheck, Menu, Brain } from "lucide-react";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { useDocumentCounts } from '@/hooks/use-document-counts';
 import { ThemeSwitcher } from "./ui/theme-switcher";
@@ -9,8 +9,8 @@ import { Badge } from "./ui/badge";
 import { GradientButton } from "./ui/gradient-button";
 
 interface DashboardSidebarProps {
-  currentTab?: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account';
-  onTabChange?: (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account') => void;
+  currentTab?: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account' | 'models';
+  onTabChange?: (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account' | 'models') => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -20,7 +20,7 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
   const { user, isLoaded } = useUser();
   const counts = useDocumentCounts();
 
-  const handleTabClick = (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account') => {
+  const handleTabClick = (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account' | 'models') => {
     console.log('Sidebar tab clicked:', tab);
     if (onTabChange) {
       console.log('Calling onTabChange with:', tab);
@@ -122,6 +122,12 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
               icon={<Layers className="w-4 h-4" />} 
               onClick={() => handleTabClick('prompt-gallery')}
               active={currentTab === 'prompt-gallery'} 
+            />
+            <SidebarLink 
+              label="Models Testing" 
+              icon={<Brain className="w-4 h-4" />} 
+              onClick={() => handleTabClick('models')}
+              active={currentTab === 'models'} 
             />
             <div className="pt-1.5 mt-1.5 border-t border-gray-100 dark:border-zinc-800">
               <GradientButton className="w-full text-sm py-2.5 px-3 min-w-0" onClick={() => console.log('Get Pro clicked')}>

@@ -10,11 +10,12 @@ import { SavedTab } from '@/components/SavedTab';
 import { TrashTab } from '@/components/TrashTab';
 import PromptGalleryTab from '@/components/PromptGalleryTab';
 import { AccountSettings } from '@/components/AccountSettings';
+import ModelsTestingPage from './models/page';
 
 export default function DashboardPage() {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
-  const [currentTab, setCurrentTab] = useState<'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account'>('documents');
+  const [currentTab, setCurrentTab] = useState<'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account' | 'models'>('documents');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Redirect to home page if user is not authenticated
@@ -24,7 +25,7 @@ export default function DashboardPage() {
     }
   }, [isLoaded, isSignedIn, router]);
 
-  const handleTabChange = (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account') => {
+  const handleTabChange = (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account' | 'models') => {
     setCurrentTab(tab);
   };
 
@@ -40,6 +41,8 @@ export default function DashboardPage() {
         return <PromptGalleryTab />;
       case 'account':
         return <AccountSettings />;
+      case 'models':
+        return <ModelsTestingPage />;
       default:
         return <DocumentsTab />;
     }

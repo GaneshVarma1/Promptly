@@ -106,7 +106,12 @@ export interface UpdateDocumentRequest {
 export const AIModels = {
   LLAMA_70B: 'llama-70b',
   EXAONE_32B: 'exaone-32b',
-  AFM_4_5B: 'afm-4.5b'
+  AFM_4_5B: 'afm-4.5b',
+  LLAMA_3B: 'llama-3b',
+  LLAMA_8B: 'llama-8b',
+  LLAMA_11B_VISION: 'llama-11b-vision',
+  MIXTRAL_8X7B: 'mixtral-8x7b',
+  DIALOGPT_MEDIUM: 'dialogpt-medium'
 } as const;
 
 export type ModelType = typeof AIModels[keyof typeof AIModels];
