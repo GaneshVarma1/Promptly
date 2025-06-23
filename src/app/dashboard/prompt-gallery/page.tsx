@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, FileText, Copy, Star, Download } from 'lucide-react';
 import { DashboardSidebar } from '@/components/DashboardSidebar';
 import { useRouter } from 'next/navigation';
+import { useUser } from "@clerk/nextjs";
 
 // Sample prompt templates
 const promptTemplates = [
@@ -49,11 +50,19 @@ const categories = ["All", "Content Writing", "Development", "Marketing", "Data 
 const difficulties = ["All", "Beginner", "Intermediate", "Advanced"];
 
 export default function PromptGalleryPage() {
+  const { isSignedIn, isLoaded } = useUser();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
   const [currentTab, setCurrentTab] = useState<'documents' | 'saved' | 'trash' | 'prompt-gallery'>('prompt-gallery');
   const router = useRouter();
+
+  // Redirect to home page if user is not authenticated
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/');
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   const handleTabChange = (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery') => {
     setCurrentTab(tab);
@@ -85,6 +94,20 @@ export default function PromptGalleryPage() {
       default: return "bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400";
     }
   };
+
+  // Show loading spinner while checking authentication
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Don't render the page if user is not signed in
+  if (!isSignedIn) {
+    return null; // This will be handled by the useEffect redirect
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-zinc-950">

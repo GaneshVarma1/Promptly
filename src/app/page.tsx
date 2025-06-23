@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import LandingPage from "@/components/LandingPage";
+import Header from "@/components/Header";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -45,11 +46,14 @@ export default function Home() {
   // If user is signed in, they'll be redirected to dashboard
   // This page only shows for non-authenticated users
   return (
-    <main>
-      <LandingPage 
-        onGetStarted={handleGetStarted}
-        onPromptSubmit={handlePromptSubmit}
-      />
-    </main>
+    <div className="min-h-screen">
+      <Header />
+      <main>
+        <LandingPage 
+          onGetStarted={handleGetStarted}
+          onPromptSubmit={handlePromptSubmit}
+        />
+      </main>
+    </div>
   );
 }

@@ -1,25 +1,51 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { neobrutalism } from "@clerk/themes";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import Script from "next/script";
+import { Suspense } from "react";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: 'swap',
+  preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: "Refine AI Write - Prompt Analysis Tool",
   description: "AI-powered prompt analysis and improvement tool",
 };
+
+// Error boundary component
+function ErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
+  return (
+    <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center">
+      <div className="text-center p-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Something went wrong
+        </h1>
+        <p className="text-gray-600 dark:text-zinc-400 mb-6">
+          {error.message || "An unexpected error occurred"}
+        </p>
+        <button
+          onClick={reset}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+        >
+          Try again
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -31,103 +57,14 @@ export default function RootLayout({
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
       appearance={{
-        elements: {
-          // Main containers
-          formButtonPrimary: 
-            "bg-blue-600 hover:bg-blue-700 text-white text-sm normal-case",
-          card: "bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800",
-          rootBox: "bg-white dark:bg-zinc-900",
-          modalContent: "bg-white dark:bg-zinc-900",
-          pageScrollBox: "bg-white dark:bg-zinc-900",
-          
-          // Headers and titles
-          headerTitle: "text-gray-900 dark:text-white",
-          headerSubtitle: "text-gray-600 dark:text-zinc-400",
-          
-          // Form elements
-          formFieldLabel: "text-gray-900 dark:text-white",
-          formFieldInput: 
-            "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white focus:ring-blue-500 placeholder:text-gray-500 dark:placeholder:text-zinc-400",
-          formFieldInputShowPasswordButton: "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200",
-          
-          // Text elements
-          alertText: "text-gray-900 dark:text-white",
-          formFieldErrorText: "text-red-600 dark:text-red-400",
-          formFieldSuccessText: "text-green-600 dark:text-green-400",
-          formFieldHintText: "text-gray-500 dark:text-zinc-400",
-          formFieldWarningText: "text-amber-600 dark:text-amber-400",
-          identityPreviewText: "text-gray-900 dark:text-white",
-          profileSectionTitle: "text-gray-900 dark:text-white",
-          profileSectionContent: "text-gray-600 dark:text-zinc-400",
-          
-          // Buttons
-          formButtonReset: "text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white",
-          socialButtonsBlockButton: 
-            "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800",
-          socialButtonsBlockButtonText: "text-gray-900 dark:text-white",
-          
-          // Links and interactive elements
-          footerActionLink: "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
-          
-          // Dividers
-          dividerLine: "bg-gray-200 dark:bg-zinc-800",
-          dividerText: "text-gray-500 dark:text-zinc-400",
-          
-          // OTP and special inputs
-          otpCodeFieldInput: 
-            "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white",
-          
-          // Modal and popover elements
-          modalCloseButton: "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200",
-          userButtonPopoverCard: "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800",
-          userButtonPopoverText: "text-gray-900 dark:text-white",
-          
-          // Navigation elements
-          breadcrumbs: "text-gray-500 dark:text-zinc-400",
-          breadcrumbsItem: "text-gray-500 dark:text-zinc-400",
-          breadcrumbsItemDivider: "text-gray-300 dark:text-zinc-600",
-          navbar: "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800",
-          navbarButton: "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800",
-          
-          // Additional text elements that might be missing
-          formHeaderTitle: "text-gray-900 dark:text-white",
-          formHeaderSubtitle: "text-gray-600 dark:text-zinc-400",
-          selectButton: "text-gray-900 dark:text-white bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800",
-          selectOption: "text-gray-900 dark:text-white",
-          selectOptionText: "text-gray-900 dark:text-white",
-          menuButton: "text-gray-900 dark:text-white",
-          menuItem: "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800",
-          menuItemText: "text-gray-900 dark:text-white",
-          userPreviewMainIdentifier: "text-gray-900 dark:text-white",
-          userPreviewSecondaryIdentifier: "text-gray-600 dark:text-zinc-400",
-          userButtonOuterIdentifier: "text-gray-900 dark:text-white",
-          userButtonInnerIdentifier: "text-gray-600 dark:text-zinc-400",
-          
-          // Form control elements
-          phoneInputBox: "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white",
-          formControlLabel: "text-gray-900 dark:text-white",
-          formControlInput: "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white",
-          
-          // File upload elements
-          fileDropAreaBox: "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800",
-          fileDropAreaButtonPrimary: "text-blue-600 dark:text-blue-400",
-          fileDropAreaHint: "text-gray-500 dark:text-zinc-400",
-          
-          // Tab elements
-          tabButton: "text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white data-[state=active]:text-gray-900 dark:data-[state=active]:text-white",
-          tabPanel: "text-gray-900 dark:text-white",
-          
-          // Badge and tag elements
-          badge: "text-gray-900 dark:text-white bg-gray-100 dark:bg-zinc-800",
-          tag: "text-gray-900 dark:text-white bg-gray-100 dark:bg-zinc-800",
-        },
+        baseTheme: neobrutalism,
         variables: {
-          colorPrimary: "#2563eb", // blue-600
-          colorDanger: "#dc2626", // red-600
-          colorSuccess: "#16a34a", // green-600
-          colorWarning: "#d97706", // amber-600
-          colorTextOnPrimaryBackground: "#ffffff", // white text on primary buttons
-          colorTextSecondary: "#6b7280", // gray-500 for light mode, will be overridden by CSS
+          colorPrimary: "#2563eb", // Promptly blue
+          colorText: "#1f2937", // Dark gray for better readability
+          colorTextSecondary: "#6b7280", // Medium gray
+          colorBackground: "#ffffff", // White background
+          colorInputBackground: "#f9fafb", // Light gray input background
+          colorInputText: "#1f2937", // Dark text in inputs
         },
       }}
     >
@@ -138,22 +75,61 @@ export default function RootLayout({
             strategy="beforeInteractive"
             dangerouslySetInnerHTML={{
               __html: `
-                try {
-                  const theme = localStorage.getItem('promptly-theme') || 'light';
-                  if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
+                (function() {
+                  try {
+                    const theme = localStorage.getItem('promptly-theme');
+                    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const shouldUseDark = theme === 'dark' || (!theme && prefersDark);
+                    
+                    if (shouldUseDark) {
+                      document.documentElement.classList.add('dark');
+                      document.documentElement.style.colorScheme = 'dark';
+                    } else {
+                      document.documentElement.classList.remove('dark');
+                      document.documentElement.style.colorScheme = 'light';
+                    }
+                    
+                    // Set initial variables to prevent flash
+                    document.documentElement.style.setProperty('--initial-theme', shouldUseDark ? 'dark' : 'light');
+                  } catch (e) {
+                    console.warn('Theme initialization failed:', e);
                   }
-                  console.log('Theme initialized:', theme);
-                } catch (e) {
-                  console.log('Theme initialization failed:', e);
-                }
+                })();
               `,
             }}
           />
           <style dangerouslySetInnerHTML={{
             __html: `
+              /* Prevent flash of unstyled content */
+              html {
+                visibility: hidden;
+              }
+              
+              html.fonts-loaded {
+                visibility: visible;
+              }
+              
+              /* Ensure immediate theme application */
+              html:not(.dark) {
+                --background: 0 0% 100%;
+                --foreground: 222.2 84% 4.9%;
+                --card: 0 0% 100%;
+                --card-foreground: 222.2 84% 4.9%;
+                --border: 214.3 31.8% 91.4%;
+                --muted: 210 40% 96.1%;
+                --muted-foreground: 215.4 16.3% 46.9%;
+              }
+              
+              html.dark {
+                --background: 0 0% 0%;
+                --foreground: 0 0% 100%;
+                --card: 0 0% 6%;
+                --card-foreground: 0 0% 100%;
+                --border: 0 0% 20%;
+                --muted: 0 0% 16%;
+                --muted-foreground: 0 0% 60%;
+              }
+              
               /* Ensure all Clerk text elements inherit proper colors in dark mode */
               .dark .cl-rootBox *,
               .dark .cl-modalContent *,
@@ -206,12 +182,58 @@ export default function RootLayout({
               }
             `
           }} />
+          <Script
+            id="font-loaded"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                document.fonts.ready.then(function() {
+                  document.documentElement.classList.add('fonts-loaded');
+                  document.documentElement.style.visibility = 'visible';
+                });
+                
+                // Fallback in case font loading takes too long
+                setTimeout(function() {
+                  document.documentElement.classList.add('fonts-loaded');
+                  document.documentElement.style.visibility = 'visible';
+                }, 100);
+              `,
+            }}
+          />
+          <Script
+            id="error-handler"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                // Handle chunk loading errors
+                window.addEventListener('unhandledrejection', function(event) {
+                  if (event.reason && event.reason.name === 'ChunkLoadError') {
+                    console.warn('Chunk load error detected, reloading page...');
+                    window.location.reload();
+                  }
+                });
+                
+                // Handle other dynamic import errors
+                window.addEventListener('error', function(event) {
+                  if (event.message && event.message.includes('Loading chunk')) {
+                    console.warn('Chunk loading failed, reloading page...');
+                    window.location.reload();
+                  }
+                });
+              `,
+            }}
+          />
         </head>
         <body
           className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground font-sussie`}
         >
-          <Header />
-          {children}
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          }>
+            {children}
+          </Suspense>
         </body>
       </html>
     </ClerkProvider>

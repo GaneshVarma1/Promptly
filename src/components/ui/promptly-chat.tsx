@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useUser, useClerk } from "@clerk/nextjs";
 import {
     ImageIcon,
     FileUp,
@@ -70,10 +71,18 @@ export interface PromptlyChatProps {
 
 export function PromptlyChat({ onPromptSubmit }: PromptlyChatProps) {
     const [value, setValue] = useState("");
+    const { isSignedIn } = useUser();
+    const clerk = useClerk();
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
         maxHeight: 200,
     });
+
+    const handleAuthAction = () => {
+        if (!isSignedIn) {
+            clerk.openSignIn({});
+        }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -180,22 +189,27 @@ export function PromptlyChat({ onPromptSubmit }: PromptlyChatProps) {
                     <ActionButton
                         icon={<FileUp className="w-4 h-4" />}
                         label="Upload Prompt File"
+                        onClick={handleAuthAction}
                     />
                     <ActionButton
                         icon={<MonitorIcon className="w-4 h-4" />}
                         label="Prompt Templates"
+                        onClick={handleAuthAction}
                     />
                     <ActionButton
                         icon={<Figma className="w-4 h-4" />}
                         label="Prompt Gallery"
+                        onClick={handleAuthAction}
                     />
                     <ActionButton
                         icon={<CircleUserRound className="w-4 h-4" />}
                         label="My Prompts"
+                        onClick={handleAuthAction}
                     />
                     <ActionButton
                         icon={<PlusIcon className="w-4 h-4" />}
                         label="New Prompt"
+                        onClick={handleAuthAction}
                     />
                 </div>
             </div>
@@ -206,12 +220,14 @@ export function PromptlyChat({ onPromptSubmit }: PromptlyChatProps) {
 interface ActionButtonProps {
     icon: React.ReactNode;
     label: string;
+    onClick?: () => void;
 }
 
-function ActionButton({ icon, label }: ActionButtonProps) {
+function ActionButton({ icon, label, onClick }: ActionButtonProps) {
     return (
         <button
             type="button"
+            onClick={onClick}
             className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors border border-border rounded-lg hover:bg-accent"
         >
             {icon}
