@@ -95,19 +95,19 @@ const Header: FC = () => {
                 <>
                   <Link 
                     href="/dashboard" 
-                    className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground hover:text-foreground"
+                    className="text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
                   >
                     Dashboard
                   </Link>
                   <Link 
                     href="/dashboard/prompt-gallery" 
-                    className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground hover:text-foreground"
+                    className="text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
                   >
                     Gallery
                   </Link>
                   <Link 
                     href="/dashboard/saved" 
-                    className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground hover:text-foreground"
+                    className="text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
                   >
                     Saved
                   </Link>
