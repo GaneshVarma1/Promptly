@@ -38,6 +38,7 @@ export default function ModelsTestingPage() {
   const [modelStatuses, setModelStatuses] = useState<ModelStatus[]>([]);
   const [isTestingAll, setIsTestingAll] = useState(false);
   const [lastTestRun, setLastTestRun] = useState<string>('');
+  const [hasInitialTestRun, setHasInitialTestRun] = useState(false);
 
   // Redirect to home page if user is not authenticated
   useEffect(() => {
@@ -46,8 +47,27 @@ export default function ModelsTestingPage() {
     }
   }, [isLoaded, isSignedIn, router]);
 
-  // Initialize model statuses
+  // Load cached results or initialize model statuses
   useEffect(() => {
+    const cacheKey = 'ai-models-test-results';
+    const cachedResults = localStorage.getItem(cacheKey);
+    
+    if (cachedResults) {
+      try {
+        const { statuses, lastTestTime } = JSON.parse(cachedResults);
+        setModelStatuses(statuses);
+        setLastTestRun(lastTestTime);
+        setHasInitialTestRun(true);
+      } catch (error) {
+        console.error('Failed to parse cached results:', error);
+        initializeWithAutoTest();
+      }
+    } else {
+      initializeWithAutoTest();
+    }
+  }, []);
+
+  const initializeWithAutoTest = () => {
     const initialStatuses: ModelStatus[] = Object.entries(AI_MODELS).map(([key, config]) => ({
       id: config.id as ModelType,
       name: config.name,
@@ -56,9 +76,9 @@ export default function ModelsTestingPage() {
     }));
     setModelStatuses(initialStatuses);
     
-    // Auto-test on load
+    // Auto-test only on first load (no cached results)
     testAllModels(initialStatuses);
-  }, []);
+  };
 
   const testModel = async (model: ModelStatus): Promise<ModelStatus> => {
     const startTime = Date.now();
@@ -88,6 +108,16 @@ export default function ModelsTestingPage() {
     }
   };
 
+  // Cache results to localStorage
+  const cacheResults = (statuses: ModelStatus[], testTime: string) => {
+    const cacheKey = 'ai-models-test-results';
+    const cacheData = {
+      statuses,
+      lastTestTime: testTime
+    };
+    localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+  };
+
   const testAllModels = async (initialStatuses?: ModelStatus[]) => {
     setIsTestingAll(true);
     const statusesToTest = initialStatuses || modelStatuses;
@@ -115,8 +145,13 @@ export default function ModelsTestingPage() {
         }
       });
 
+      const testTime = new Date().toLocaleString();
       setModelStatuses(updatedStatuses);
-      setLastTestRun(new Date().toLocaleString());
+      setLastTestRun(testTime);
+      setHasInitialTestRun(true);
+      
+      // Cache the results
+      cacheResults(updatedStatuses, testTime);
     } finally {
       setIsTestingAll(false);
     }
@@ -133,9 +168,16 @@ export default function ModelsTestingPage() {
 
     const updatedModel = await testModel(modelStatuses[modelIndex]);
     
-    setModelStatuses(prev => prev.map((model, index) => 
+    const updatedStatuses = modelStatuses.map((model, index) => 
       index === modelIndex ? updatedModel : model
-    ));
+    );
+    
+    const testTime = new Date().toLocaleString();
+    setModelStatuses(updatedStatuses);
+    setLastTestRun(testTime);
+    
+    // Cache the updated results
+    cacheResults(updatedStatuses, testTime);
   };
 
   const getStatusIcon = (status: ModelStatus['status']) => {
@@ -190,6 +232,18 @@ export default function ModelsTestingPage() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <Button
+                onClick={() => {
+                  localStorage.removeItem('ai-models-test-results');
+                  setHasInitialTestRun(false);
+                  initializeWithAutoTest();
+                }}
+                variant="ghost"
+                size="sm"
+                className="text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+              >
+                Clear Cache
+              </Button>
               <Button
                 onClick={() => testAllModels()}
                 disabled={isTestingAll}

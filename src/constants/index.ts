@@ -10,7 +10,7 @@
 
 export const API_CONFIG = {
   TOGETHER_AI: {
-    BASE_URL: 'https://api.together.xyz/v1',
+    BASE_URL: 'https://api.together.ai',
     TIMEOUT: 30000, // 30 seconds
     RETRY_ATTEMPTS: 3,
     RATE_LIMIT_DELAY: 1000, // 1 second

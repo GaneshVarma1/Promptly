@@ -684,7 +684,7 @@ export async function analyzePrompt(text: string, model: ModelType = 'llama-70b'
   if (!apiKey || apiKey === 'your_together_ai_api_key_here') {
     console.warn('⚠️ TOGETHER_API_KEY not configured. Using mock AI response for development.');
     console.warn('   Set TOGETHER_API_KEY environment variable for real AI functionality.');
-    console.warn('   Get your API key from: https://api.together.xyz/');
+    console.warn('   Get your API key from: https://api.together.ai/');
     
     // Return mock response for development
     const length = text.length;
