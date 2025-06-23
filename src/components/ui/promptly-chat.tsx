@@ -187,6 +187,13 @@ export function PromptlyChat({ onPromptSubmit }: PromptlyChatProps) {
                     </div>
                 </div>
 
+                {/* Mock input notice */}
+                <div className="text-center mt-2">
+                    <p className="text-xs text-muted-foreground/70">
+                        This is just a mock input field
+                    </p>
+                </div>
+
                 {/* Action buttons with responsive layout */}
                 <div className={cn(
                     "flex items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 flex-wrap",

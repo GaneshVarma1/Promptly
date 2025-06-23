@@ -1,6 +1,12 @@
-import { FC } from "react";
-import { PromptlyChat } from "@/components/ui/promptly-chat";
-import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import { FC, useEffect, useState } from "react";
+import {
+  HeroSection,
+  ProblemStatementSection,
+  WhyChooseSection,
+  HowItWorksSection,
+  BenefitsSection,
+  AnimatedBackground
+} from "@/components/landing";
 
 /**
  * Props for the LandingPage component.
@@ -15,32 +21,25 @@ export interface LandingPageProps {
  * Handles prompt input and demo navigation.
  */
 const LandingPage: FC<LandingPageProps> = ({ onGetStarted, onPromptSubmit }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] w-full bg-background relative flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-      {/* Animated Background Grid */}
-      <FlickeringGrid
-        className="absolute inset-0 z-0"
-        squareSize={4}
-        gridGap={6}
-        color="rgb(107, 114, 128)" // gray-500 for light mode
-        maxOpacity={0.1}
-        flickerChance={0.05}
-      />
+    <div className="min-h-screen w-full bg-background relative overflow-hidden">
+      <AnimatedBackground />
       
-      {/* Dark mode grid overlay */}
-      <FlickeringGrid
-        className="absolute inset-0 z-0 opacity-0 dark:opacity-100 transition-opacity duration-300"
-        squareSize={4}
-        gridGap={6}
-        color="rgb(156, 163, 175)" // gray-400 for dark mode
-        maxOpacity={0.15}
-        flickerChance={0.08}
-      />
+      <HeroSection isVisible={isVisible} onPromptSubmit={onPromptSubmit} />
       
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto">
-        <PromptlyChat onPromptSubmit={onPromptSubmit} />
-      </div>
+      <ProblemStatementSection isVisible={isVisible} />
+      
+      <WhyChooseSection isVisible={isVisible} />
+      
+      <HowItWorksSection isVisible={isVisible} />
+      
+      <BenefitsSection isVisible={isVisible} onGetStarted={onGetStarted} />
     </div>
   );
 };
