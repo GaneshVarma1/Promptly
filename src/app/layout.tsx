@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { neobrutalism } from "@clerk/themes";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
@@ -56,17 +55,6 @@ export default function RootLayout({
     <ClerkProvider
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
-      appearance={{
-        baseTheme: neobrutalism,
-        variables: {
-          colorPrimary: "#2563eb", // Promptly blue
-          colorText: "#1f2937", // Dark gray for better readability
-          colorTextSecondary: "#6b7280", // Medium gray
-          colorBackground: "#ffffff", // White background
-          colorInputBackground: "#f9fafb", // Light gray input background
-          colorInputText: "#1f2937", // Dark text in inputs
-        },
-      }}
     >
       <html lang="en" suppressHydrationWarning>
         <head>
@@ -130,56 +118,7 @@ export default function RootLayout({
                 --muted-foreground: 0 0% 60%;
               }
               
-              /* Ensure all Clerk text elements inherit proper colors in dark mode */
-              .dark .cl-rootBox *,
-              .dark .cl-modalContent *,
-              .dark .cl-card *,
-              .dark .cl-userButtonPopoverCard * {
-                color: white !important;
-              }
-              
-              /* Override for specific elements that should have different colors */
-              .dark .cl-formFieldErrorText,
-              .dark .cl-formFieldErrorText * {
-                color: #f87171 !important; /* red-400 */
-              }
-              
-              .dark .cl-formFieldSuccessText,
-              .dark .cl-formFieldSuccessText * {
-                color: #4ade80 !important; /* green-400 */
-              }
-              
-              .dark .cl-formFieldWarningText,
-              .dark .cl-formFieldWarningText * {
-                color: #fbbf24 !important; /* amber-400 */
-              }
-              
-              .dark .cl-formFieldHintText,
-              .dark .cl-headerSubtitle,
-              .dark .cl-profileSectionContent,
-              .dark .cl-dividerText,
-              .dark .cl-userPreviewSecondaryIdentifier,
-              .dark .cl-userButtonInnerIdentifier {
-                color: #a1a1aa !important; /* zinc-400 */
-              }
-              
-              .dark .cl-footerActionLink {
-                color: #60a5fa !important; /* blue-400 */
-              }
-              
-              /* Ensure input placeholders are properly styled */
-              .dark .cl-formFieldInput::placeholder {
-                color: #a1a1aa !important; /* zinc-400 */
-              }
-              
-              /* Fix button text colors */
-              .dark .cl-formButtonPrimary * {
-                color: white !important;
-              }
-              
-              .dark .cl-socialButtonsBlockButton * {
-                color: white !important;
-              }
+
             `
           }} />
           <Script

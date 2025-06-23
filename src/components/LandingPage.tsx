@@ -16,7 +16,7 @@ export interface LandingPageProps {
  */
 const LandingPage: FC<LandingPageProps> = ({ onGetStarted, onPromptSubmit }) => {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] w-full bg-background relative flex items-center justify-center py-8">
+    <div className="min-h-[calc(100vh-3.5rem)] w-full bg-background relative flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
       {/* Animated Background Grid */}
       <FlickeringGrid
         className="absolute inset-0 z-0"
@@ -38,7 +38,7 @@ const LandingPage: FC<LandingPageProps> = ({ onGetStarted, onPromptSubmit }) => 
       />
       
       {/* Content */}
-      <div className="relative z-10 w-full">
+      <div className="relative z-10 w-full max-w-5xl mx-auto">
         <PromptlyChat onPromptSubmit={onPromptSubmit} />
       </div>
     </div>
