@@ -71,6 +71,13 @@ export default function ResultsPage() {
     try {
       const modelType = modelTypeMapping[model as keyof typeof modelTypeMapping] || 'llama-70b';
       const result = await analyzePromptClient(text, modelType);
+      
+      // Debug logging to see the actual structure
+      console.log('🔍 Analysis result:', result);
+      console.log('🔍 Analysis score:', result?.score);
+      console.log('🔍 Analysis suggestions:', result?.suggestions);
+      console.log('🔍 Analysis improvements:', result?.improvements);
+      
       setAnalysis(result);
       
       // Save the AI score to localStorage for the dashboard

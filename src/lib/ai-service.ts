@@ -311,7 +311,7 @@ export class AIAnalysisService {
     const parsed = this.parseAnalysisResponse(content, text, model);
     this.validateAnalysisResponse(parsed);
     
-    return this.adjustScoreForLength(parsed, text);
+    return parsed;
   }
 
   private buildAnalysisPrompt(text: string, options: AnalysisOptions, model: ModelType = 'llama-70b'): string {
@@ -374,21 +374,27 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
     model: ModelType = 'afm-4.5b'
   ): Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'> {
     try {
+      console.log('🔧 Raw AI response content:', content);
+      
       // Extract JSON from response (handle cases where AI adds extra text)
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
+        console.error('🔧 No JSON found in AI response');
         throw new Error('No valid JSON found in response');
       }
 
+      console.log('🔧 Extracted JSON:', jsonMatch[0]);
       const parsed = JSON.parse(jsonMatch[0]);
+      console.log('🔧 Parsed AI response:', parsed);
       
       // Validate required fields
       this.validateAnalysisResponse(parsed);
       
       // Apply content-length based scoring adjustments
       const adjustedScore = this.adjustScoreForLength(parsed.score, originalText);
+      console.log('🔧 Adjusted score:', adjustedScore);
       
-      return {
+      const result = {
         score: adjustedScore,
         suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
         improvements: Array.isArray(parsed.improvements) ? parsed.improvements : [],
@@ -397,9 +403,13 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
         category: parsed.category || 'general',
         confidence: Math.max(0, Math.min(100, parsed.confidence || 75)),
       };
+      
+      console.log('🔧 Final parsed result:', result);
+      return result;
 
     } catch (error) {
-      console.error('Failed to parse AI response:', error);
+      console.error('🔧 Failed to parse AI response:', error);
+      console.log('🔧 Using fallback analysis');
       
       // Return fallback analysis
       return this.generateFallbackAnalysis(originalText, model);
@@ -435,13 +445,18 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
     }
     
     const [minScore, maxScore] = config[lengthCategory].scoreRange;
-    const adjustmentFactor = (maxScore - minScore) / 100;
+    
+    // Normalize scores to the appropriate range for the content length
+    const normalizeScore = (originalScore: number) => {
+      const normalizedScore = (originalScore / 100) * (maxScore - minScore) + minScore;
+      return Math.min(100, Math.max(0, Math.round(normalizedScore)));
+    };
     
     return {
-      clarity: Math.min(100, Math.max(minScore, score.clarity * adjustmentFactor + minScore)),
-      context: Math.min(100, Math.max(minScore, score.context * adjustmentFactor + minScore)),
-      format: Math.min(100, Math.max(minScore, score.format * adjustmentFactor + minScore)),
-      overall: Math.min(100, Math.max(minScore, score.overall * adjustmentFactor + minScore)),
+      clarity: normalizeScore(score.clarity || 0),
+      context: normalizeScore(score.context || 0),
+      format: normalizeScore(score.format || 0),
+      overall: normalizeScore(score.overall || 0),
     };
   }
 
