@@ -388,7 +388,7 @@ export default function ResultsPage() {
                 {isAnalyzing ? (
                   <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                 ) : (
-                  analysis ? analysis.score.overall : 0
+                  analysis?.score?.overall || 0
                 )}
               </span>
               <span className="text-xs md:text-sm text-gray-600 dark:text-zinc-400 hidden sm:inline">Overall score</span>

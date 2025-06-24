@@ -26,6 +26,14 @@ export interface PromptScoreProps {
  * Uses color and badge indicators for clarity.
  */
 const PromptScore: FC<PromptScoreProps> = ({ score }) => {
+  // Ensure score object has all required properties with fallbacks
+  const safeScore = {
+    clarity: score?.clarity ?? 0,
+    context: score?.context ?? 0,
+    format: score?.format ?? 0,
+    overall: score?.overall ?? 0,
+  };
+
   // Color for score value
   const getScoreColor = (value: number) => {
     if (value >= 80) return "text-green-600 dark:text-green-400";
@@ -53,23 +61,23 @@ const PromptScore: FC<PromptScoreProps> = ({ score }) => {
   const metrics = useMemo(() => [
     {
       name: "Clarity",
-      value: score.clarity,
+      value: safeScore.clarity,
       icon: Eye,
       description: "How clear and specific your prompt is",
     },
     {
       name: "Context",
-      value: score.context,
+      value: safeScore.context,
       icon: Target,
       description: "Sufficient background information provided",
     },
     {
       name: "Format",
-      value: score.format,
+      value: safeScore.format,
       icon: FileText,
       description: "Structure and desired output format",
     },
-  ], [score]);
+  ], [safeScore]);
 
   return (
     <Card className="p-6 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-lg transition-colors">
@@ -78,14 +86,14 @@ const PromptScore: FC<PromptScoreProps> = ({ score }) => {
         <Award className="w-5 h-5 text-purple-500 dark:text-purple-400" />
         <h3 className="font-semibold text-gray-900 dark:text-white font-sussie">Prompt Score</h3>
       </div>
-      {score.overall > 0 ? (
+      {safeScore.overall > 0 ? (
         <>
           <div className="text-center mb-6">
-            <div className={`text-3xl font-bold ${getScoreColor(score.overall)} mb-2 font-sussie`}>
-              {score.overall}%
+            <div className={`text-3xl font-bold ${getScoreColor(safeScore.overall)} mb-2 font-sussie`}>
+              {safeScore.overall}%
             </div>
-            <Badge className={`mb-2 ${getScoreBadge(score.overall).className} font-sussie`}>
-              {getScoreBadge(score.overall).label}
+            <Badge className={`mb-2 ${getScoreBadge(safeScore.overall).className} font-sussie`}>
+              {getScoreBadge(safeScore.overall).label}
             </Badge>
             <p className="text-xs text-gray-500 dark:text-zinc-400 font-sussie">Overall prompt quality</p>
           </div>
