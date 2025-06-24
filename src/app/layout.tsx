@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, League_Spartan } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Suspense } from "react";
@@ -16,6 +16,13 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: 'swap',
+});
+
+const leagueSpartan = League_Spartan({
+  variable: "--font-league-spartan",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: 'swap',
 });
 
@@ -164,7 +171,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground font-sussie`}
+          className={`${inter.variable} ${jetbrainsMono.variable} ${leagueSpartan.variable} antialiased bg-background text-foreground font-sussie`}
         >
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">

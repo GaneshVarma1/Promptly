@@ -31,6 +31,7 @@ export default {
 				sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
 				mono: ['var(--font-jetbrains-mono)', 'monospace'],
 				'sussie': ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+				'league-spartan': ['var(--font-league-spartan)', 'League Spartan', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

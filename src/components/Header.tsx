@@ -28,8 +28,8 @@ const Header: FC = () => {
         <div className="container flex h-14 max-w-screen-2xl items-center px-4 sm:px-6 lg:px-8">
           <div className="mr-4 hidden md:flex">
             <div className="mr-6 flex items-center space-x-2">
-              <span className="text-lg font-semibold text-foreground font-sussie">
-                Promptly
+              <span className="text-lg font-bold text-foreground font-league-spartan">
+                Promptly.
               </span>
             </div>
           </div>
@@ -37,8 +37,8 @@ const Header: FC = () => {
           {/* Mobile logo */}
           <div className="flex md:hidden">
             <div className="flex items-center">
-              <span className="text-base font-semibold text-foreground">
-                Promptly
+              <span className="text-base font-bold text-foreground font-league-spartan">
+                Promptly.
               </span>
             </div>
           </div>
@@ -75,8 +75,8 @@ const Header: FC = () => {
       <div className="container flex h-14 max-w-screen-2xl items-center px-4 sm:px-6 lg:px-8">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="text-lg font-semibold text-foreground font-sussie">
-              Promptly
+            <span className="text-lg font-bold text-foreground font-league-spartan">
+              Promptly.
             </span>
           </Link>
         </div>
@@ -84,8 +84,8 @@ const Header: FC = () => {
         {/* Mobile logo */}
         <div className="flex md:hidden">
           <Link href="/" className="flex items-center">
-            <span className="text-base font-semibold text-foreground">
-              Promptly
+            <span className="text-base font-bold text-foreground font-league-spartan">
+              Promptly.
             </span>
           </Link>
         </div>

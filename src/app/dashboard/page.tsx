@@ -73,7 +73,7 @@ export default function DashboardPage() {
         >
           <Menu className="w-5 h-5 text-gray-600 dark:text-zinc-400" />
         </button>
-        <span className="ml-2 text-lg font-bold text-gray-900 dark:text-white font-sussie">Promptly</span>
+        <span className="ml-2 text-lg font-bold text-gray-900 dark:text-white font-league-spartan">Promptly.</span>
       </div>
       
       {/* Mobile overlay */}

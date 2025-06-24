@@ -73,8 +73,8 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
         <div className="flex-shrink-0 p-2 border-b border-gray-100 dark:border-zinc-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-foreground">
-                Promptly
+              <span className="text-sm font-bold text-foreground font-league-spartan">
+                Promptly.
               </span>
               <Badge variant="secondary" className="text-xs px-2 py-1">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse mr-1" />
