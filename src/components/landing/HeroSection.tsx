@@ -69,7 +69,7 @@ export const HeroSection: FC<HeroSectionProps> = ({ isVisible, onPromptSubmit })
           key={isDarkMode ? 'dark' : 'light'}
           speed={4}
           scale={1.1}
-          color={isDarkMode ? "#121212" : "#f8fafc"}
+          color={isDarkMode ? "#212022" : "#f8fafc"}
           noiseIntensity={0.8}
           rotation={0}
         />
