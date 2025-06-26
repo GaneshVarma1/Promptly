@@ -1,23 +1,46 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Suspense } from "react";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  display: 'swap',
-  preload: true,
-});
+// Try to load fonts with fallbacks
+let inter: any = null;
+let jetbrainsMono: any = null;
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: 'swap',
-});
+try {
+  const { Inter } = require("next/font/google");
+  inter = Inter({
+    variable: "--font-inter",
+    subsets: ["latin"],
+    weight: ["300", "400", "500", "600", "700", "800", "900"],
+    display: 'swap',
+    preload: true,
+    fallback: ['system-ui', 'Arial', 'sans-serif'],
+  });
+} catch (error) {
+  console.warn('Inter font failed to load, using fallback:', error);
+  inter = {
+    variable: "--font-inter",
+    style: { fontFamily: 'system-ui, Arial, sans-serif' }
+  };
+}
+
+try {
+  const { JetBrains_Mono } = require("next/font/google");
+  jetbrainsMono = JetBrains_Mono({
+    variable: "--font-jetbrains-mono",
+    subsets: ["latin"],
+    display: 'swap',
+    fallback: ['SF Mono', 'Monaco', 'Consolas', 'monospace'],
+  });
+} catch (error) {
+  console.warn('JetBrains Mono font failed to load, using fallback:', error);
+  jetbrainsMono = {
+    variable: "--font-jetbrains-mono",
+    style: { fontFamily: 'SF Mono, Monaco, Consolas, monospace' }
+  };
+}
 
 // Simplified font handling to prevent SSR issues
 const leagueSpartan = {
@@ -199,7 +222,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
+          className={`${inter?.variable} ${jetbrainsMono?.variable} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
           style={{ 
             backgroundColor: "#020617",
             fontFamily: 'var(--font-league-spartan)'
