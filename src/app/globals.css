@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font fallbacks for when Google Fonts fails */
+@layer base {
+  :root {
+    --font-league-spartan: 'League Spartan', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-jetbrains-mono: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  }
+}
+
 /* Cache buster - force reload of styles */
 
 /* Force white/dark backgrounds - override any browser defaults */
