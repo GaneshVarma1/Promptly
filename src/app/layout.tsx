@@ -51,6 +51,14 @@ const leagueSpartan = {
 export const metadata: Metadata = {
   title: "Refine AI Write - Prompt Analysis Tool",
   description: "AI-powered prompt analysis and improvement tool",
+  icons: {
+    icon: [
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/favicon.ico' }
+    ],
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
 };
 
 // Error boundary component
@@ -104,21 +112,6 @@ export default function RootLayout({
         style={{ backgroundColor: "#020617", colorScheme: "dark" }}
       >
         <head>
-          <Script
-            id="clerk-debug"
-            strategy="beforeInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                // Debug Clerk configuration
-                console.log('🔧 Clerk Debug Info:', {
-                  publishableKey: '${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? 'Set' : 'Missing'}',
-                  domain: window.location.hostname,
-                  protocol: window.location.protocol,
-                  url: window.location.href
-                });
-              `,
-            }}
-          />
           <Script
             id="theme-script"
             strategy="beforeInteractive"

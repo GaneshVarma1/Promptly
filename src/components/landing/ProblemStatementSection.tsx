@@ -21,7 +21,6 @@ const CountUp: FC<CountUpProps> = ({ end, duration = 2000, suffix = "%", isVisib
 
   useEffect(() => {
     if (isVisible && !hasStarted) {
-      console.log(`Starting CountUp animation to ${end}%`);
       setHasStarted(true);
       setCount(0); // Reset to 0 when starting
       
