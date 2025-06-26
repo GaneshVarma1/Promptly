@@ -44,10 +44,10 @@ export function SavedTab() {
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-          Saved Documents
+          Saved Prompts
         </h2>
         <p className="text-sm text-gray-500 dark:text-zinc-400">
-          Your saved documents and bookmarks
+          Your curated prompt collection and bookmarks
         </p>
       </div>
 
@@ -56,7 +56,7 @@ export function SavedTab() {
         <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <Input
           type="text"
-          placeholder="Search saved documents..."
+          placeholder="Search saved prompts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10 bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700"
@@ -70,12 +70,12 @@ export function SavedTab() {
             <StarIcon className="w-8 h-8 text-yellow-500 dark:text-yellow-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            {searchQuery ? 'No saved documents found' : 'No saved documents yet'}
+            {searchQuery ? 'No saved prompts found' : 'No saved prompts yet'}
           </h3>
           <p className="text-gray-500 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
             {searchQuery 
               ? 'Try adjusting your search terms to find what you\'re looking for.'
-              : 'Save documents by clicking the star icon on any document.'
+              : 'Save prompts by clicking the star icon on any prompt card.'
             }
           </p>
         </div>

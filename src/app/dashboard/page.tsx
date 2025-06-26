@@ -32,7 +32,7 @@ export default function DashboardPage() {
   const renderTabContent = () => {
     switch (currentTab) {
       case 'documents':
-        return <DocumentsTab />;
+        return <DocumentsTab onTabChange={handleTabChange} />;
       case 'saved':
         return <SavedTab />;
       case 'trash':

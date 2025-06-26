@@ -1,12 +1,33 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Clock, Trash2, User, Layers, ShieldCheck, Menu, Brain } from "lucide-react";
+import { 
+  FileText, 
+  Clock, 
+  Trash2, 
+  User, 
+  Layers, 
+  ShieldCheck, 
+  Menu, 
+  Brain,
+  FlaskConical,
+  BarChart3,
+  GraduationCap,
+  Zap,
+  Users,
+  ChevronDown,
+  ChevronRight,
+  TrendingUp,
+  Target,
+  BookOpen,
+  Lightbulb
+} from "lucide-react";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { useDocumentCounts } from '@/hooks/use-document-counts';
 import { ThemeSwitcher } from "./ui/theme-switcher";
 import { Badge } from "./ui/badge";
 import { GradientButton } from "./ui/gradient-button";
+import { useState } from "react";
 
 interface DashboardSidebarProps {
   currentTab?: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account' | 'models';
@@ -19,6 +40,15 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
   const pathname = usePathname();
   const { user, isLoaded } = useUser();
   const counts = useDocumentCounts();
+  const [expandedSections, setExpandedSections] = useState<string[]>(['workspace']);
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
 
   const handleTabClick = (tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery' | 'account' | 'models') => {
     console.log('Sidebar tab clicked:', tab);
@@ -30,11 +60,15 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
     }
   };
 
+  const isWorkspaceExpanded = expandedSections.includes('workspace');
+  const isToolsExpanded = expandedSections.includes('tools');
+  const isInsightsExpanded = expandedSections.includes('insights');
+  const isLearningExpanded = expandedSections.includes('learning');
+
   if (!isLoaded) {
     return (
-      <aside className={`fixed left-0 top-0 w-64 bg-white dark:bg-zinc-900 border-r border-gray-100 dark:border-zinc-800 h-screen z-50 transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block shadow-sm`}>
-        <div className="flex flex-col h-full">
-          {/* Top controls skeleton */}
+      <aside className={`fixed left-0 top-0 w-64 bg-white dark:bg-zinc-900 border-r border-gray-100 dark:border-zinc-800 h-screen max-h-[100dvh] z-50 transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block shadow-sm overflow-hidden`}>
+        <div className="flex flex-col h-full max-h-[100dvh]">
           <div className="flex-shrink-0 p-2 border-b border-gray-100 dark:border-zinc-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -43,22 +77,14 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
               </div>
             </div>
           </div>
-          
-          {/* Navigation skeleton */}
-          <div className="flex-grow overflow-y-auto px-2 py-2 min-h-0">
+          <div className="flex-grow overflow-y-auto px-2 py-2 min-h-0 max-h-[calc(100dvh-10rem)]">
             <nav className="space-y-0.5">
               <div className="h-8 bg-gray-100 dark:bg-zinc-800 rounded-lg animate-pulse"></div>
               <div className="h-8 bg-gray-100 dark:bg-zinc-800 rounded-lg animate-pulse"></div>
               <div className="h-8 bg-gray-100 dark:bg-zinc-800 rounded-lg animate-pulse"></div>
-              <div className="h-8 bg-gray-100 dark:bg-zinc-800 rounded-lg animate-pulse"></div>
-              <div className="pt-1.5 mt-1.5 border-t border-gray-100 dark:border-zinc-800">
-                <div className="h-8 bg-gradient-to-r from-purple-200 to-blue-200 dark:from-purple-800 dark:to-blue-800 rounded-lg animate-pulse"></div>
-              </div>
             </nav>
           </div>
-          
-          {/* User skeleton at bottom */}
-          <div className="flex-shrink-0 p-2 border-t border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50">
+          <div className="flex-shrink-0 p-2 border-t border-gray-100 dark:border-zinc-800 pb-[env(safe-area-inset-bottom,0.5rem)]">
             <div className="h-11 bg-gray-100 dark:bg-zinc-700 rounded-lg animate-pulse"></div>
           </div>
         </div>
@@ -67,10 +93,10 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
   }
 
   return (
-    <aside className={`fixed left-0 top-0 w-64 bg-white dark:bg-zinc-900 border-r border-gray-100 dark:border-zinc-800 h-screen z-50 transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block shadow-sm`}>
-      <div className="flex flex-col h-full">
-        {/* Top controls - Theme + Beta + Mobile close */}
-        <div className="flex-shrink-0 p-2 border-b border-gray-100 dark:border-zinc-800">
+    <aside className={`fixed left-0 top-0 w-64 bg-white dark:bg-zinc-900 border-r border-gray-100 dark:border-zinc-800 h-screen max-h-[100dvh] z-50 transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block shadow-sm overflow-hidden`}>
+      <div className="flex flex-col h-full max-h-[100dvh]">
+        {/* Header */}
+        <div className="flex-shrink-0 p-3 border-b border-gray-100 dark:border-zinc-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-foreground font-league-spartan">
@@ -90,56 +116,173 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
           </div>
         </div>
 
-        {/* Navigation - Takes most space */}
-        <div className="flex-grow overflow-y-auto px-2 py-2 min-h-0">
-          <nav className="space-y-0.5">
-            <SidebarLink 
-              label="Documents" 
-              icon={<FileText className="w-4 h-4" />} 
-              onClick={() => handleTabClick('documents')}
-              active={currentTab === 'documents'} 
-            />
-            <SidebarLink 
-              label="Saved" 
-              icon={<Clock className="w-4 h-4" />} 
-              onClick={() => handleTabClick('saved')}
-              active={currentTab === 'saved'} 
-            />
-            <SidebarLink 
-              label="Trash" 
-              icon={<Trash2 className="w-4 h-4" />} 
-              onClick={() => handleTabClick('trash')}
-              active={currentTab === 'trash'} 
-            />
-            <SidebarLink 
-              label="Account" 
-              icon={<User className="w-4 h-4" />} 
-              onClick={() => handleTabClick('account')}
-              active={currentTab === 'account'} 
-            />
-            <SidebarLink 
-              label="Prompt Gallery" 
-              icon={<Layers className="w-4 h-4" />} 
-              onClick={() => handleTabClick('prompt-gallery')}
-              active={currentTab === 'prompt-gallery'} 
-            />
-            <SidebarLink 
-              label="Models Testing" 
-              icon={<Brain className="w-4 h-4" />} 
-              onClick={() => handleTabClick('models')}
-              active={currentTab === 'models'} 
-            />
-            <div className="pt-1.5 mt-1.5 border-t border-gray-100 dark:border-zinc-800">
+        {/* Navigation - Organized Sections */}
+        <div className="flex-grow overflow-y-auto px-2 py-2 min-h-0 max-h-[calc(100dvh-10rem)]">
+          <nav className="space-y-1">
+            
+            {/* Workspace Section */}
+            <div>
+              <SectionHeader 
+                title="Workspace" 
+                isExpanded={isWorkspaceExpanded}
+                onToggle={() => toggleSection('workspace')}
+              />
+              {isWorkspaceExpanded && (
+                <div className="ml-2 space-y-0.5 mt-1">
+                  <SidebarLink 
+                    label="All Prompts" 
+                    icon={<FileText className="w-4 h-4" />} 
+                    onClick={() => handleTabClick('documents')}
+                    active={currentTab === 'documents'}
+                    count={counts.documents + counts.saved}
+                  />
+                  <SidebarLink 
+                    label="Saved" 
+                    icon={<Clock className="w-4 h-4" />} 
+                    onClick={() => handleTabClick('saved')}
+                    active={currentTab === 'saved'}
+                    count={counts.saved}
+                  />
+                  <SidebarLink 
+                    label="Trash" 
+                    icon={<Trash2 className="w-4 h-4" />} 
+                    onClick={() => handleTabClick('trash')}
+                    active={currentTab === 'trash'}
+                    count={counts.trash}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Tools Section */}
+            <div>
+              <SectionHeader 
+                title="Tools" 
+                isExpanded={isToolsExpanded}
+                onToggle={() => toggleSection('tools')}
+              />
+              {isToolsExpanded && (
+                <div className="ml-2 space-y-0.5 mt-1">
+                  <SidebarLink 
+                    label="Template Gallery" 
+                    icon={<Layers className="w-4 h-4" />} 
+                    onClick={() => handleTabClick('prompt-gallery')}
+                    active={currentTab === 'prompt-gallery'}
+                  />
+                  <SidebarLink 
+                    label="Model Playground" 
+                    icon={<Brain className="w-4 h-4" />} 
+                    onClick={() => handleTabClick('models')}
+                    active={currentTab === 'models'}
+                  />
+                  <SidebarLink 
+                    label="Batch Tester" 
+                    icon={<FlaskConical className="w-4 h-4" />} 
+                    onClick={() => console.log('Batch Tester coming soon')}
+                    active={false}
+                    disabled
+                    badge="Soon"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Insights Section - Only show if user has data */}
+            {(counts.documents > 0 || counts.saved > 0) && (
+              <div>
+                <SectionHeader 
+                  title="Insights" 
+                  isExpanded={isInsightsExpanded}
+                  onToggle={() => toggleSection('insights')}
+                />
+                {isInsightsExpanded && (
+                  <div className="ml-2 space-y-2 mt-2">
+                    <div className="bg-gray-50 dark:bg-zinc-800 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">Quick Stats</span>
+                      </div>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Total</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{counts.documents + counts.saved}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Saved</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{counts.saved}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-300">Success Rate</span>
+                          <span className="font-medium text-green-600 dark:text-green-400">
+                            {counts.saved > 0 ? Math.round((counts.saved / (counts.documents + counts.saved)) * 100) : 0}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Learning Section */}
+            <div>
+              <SectionHeader 
+                title="Learning" 
+                isExpanded={isLearningExpanded}
+                onToggle={() => toggleSection('learning')}
+              />
+              {isLearningExpanded && (
+                <div className="ml-2 space-y-0.5 mt-1">
+                  <SidebarLink 
+                    label="Prompting 101" 
+                    icon={<GraduationCap className="w-4 h-4" />} 
+                    onClick={() => console.log('Prompting 101 coming soon')}
+                    active={false}
+                    disabled
+                    badge="Soon"
+                  />
+                  <SidebarLink 
+                    label="Best Practices" 
+                    icon={<Target className="w-4 h-4" />} 
+                    onClick={() => console.log('Best Practices coming soon')}
+                    active={false}
+                    disabled
+                    badge="Soon"
+                  />
+                  <SidebarLink 
+                    label="Community" 
+                    icon={<Users className="w-4 h-4" />} 
+                    onClick={() => console.log('Community coming soon')}
+                    active={false}
+                    disabled
+                    badge="Soon"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Account Section */}
+            <div className="pt-2 mt-2 border-t border-gray-100 dark:border-zinc-800">
+              <SidebarLink 
+                label="Account Settings" 
+                icon={<User className="w-4 h-4" />} 
+                onClick={() => handleTabClick('account')}
+                active={currentTab === 'account'}
+              />
+            </div>
+
+            {/* Upgrade Section */}
+            <div className="pt-2 mt-2 border-t border-gray-100 dark:border-zinc-800">
               <GradientButton className="w-full text-sm py-2.5 px-3 min-w-0" onClick={() => console.log('Get Pro clicked')}>
                 <ShieldCheck className="w-4 h-4 mr-2" />
-                Get Pro
+                Upgrade Pro
               </GradientButton>
             </div>
           </nav>
         </div>
 
         {/* User section - Always at bottom */}
-        <div className="flex-shrink-0 p-2 border-t border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50">
+        <div className="flex-shrink-0 p-2 border-t border-gray-100 dark:border-zinc-800 pb-[env(safe-area-inset-bottom,0.5rem)]">
           <div className="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded-lg transition-colors cursor-pointer">
             <UserButton 
               afterSignOutUrl="/"
@@ -166,17 +309,53 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
   );
 }
 
-function SidebarLink({ label, icon, href, onClick, active, isPro }: { 
+function SectionHeader({ title, isExpanded, onToggle }: {
+  title: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-zinc-300 transition-colors"
+    >
+      <span>{title}</span>
+      {isExpanded ? (
+        <ChevronDown className="w-3 h-3" />
+      ) : (
+        <ChevronRight className="w-3 h-3" />
+      )}
+    </button>
+  );
+}
+
+function SidebarLink({ 
+  label, 
+  icon, 
+  href, 
+  onClick, 
+  active, 
+  isPro, 
+  disabled, 
+  count, 
+  badge 
+}: { 
   label: string; 
   icon: React.ReactNode; 
   href?: string; 
   onClick?: () => void;
   active?: boolean;
   isPro?: boolean;
+  disabled?: boolean;
+  count?: number;
+  badge?: string;
 }) {
   const baseStyles = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 w-full text-left relative overflow-hidden`;
   
   const getStyles = () => {
+    if (disabled) {
+      return `${baseStyles} text-gray-400 dark:text-zinc-500 cursor-not-allowed`;
+    }
     if (isPro) {
       return `${baseStyles} bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 shadow-lg transform hover:scale-[1.02]`;
     }
@@ -186,33 +365,51 @@ function SidebarLink({ label, icon, href, onClick, active, isPro }: {
     return `${baseStyles} text-gray-700 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 hover:shadow-sm`;
   };
 
-  if (onClick) {
-    return (
-      <button onClick={onClick} className={getStyles()}>
-        <div className="flex items-center gap-3 flex-1">
-          {icon}
-          <span className="font-medium">{label}</span>
-        </div>
+  const content = (
+    <>
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {icon}
+        <span className="font-medium truncate">{label}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        {count !== undefined && count > 0 && (
+          <span className="text-xs bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300 px-1.5 py-0.5 rounded-full font-medium">
+            {count}
+          </span>
+        )}
+        {badge && (
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+            {badge}
+          </Badge>
+        )}
         {isPro && (
           <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
             Pro
           </span>
         )}
+      </div>
+    </>
+  );
+
+  if (onClick && !disabled) {
+    return (
+      <button onClick={onClick} className={getStyles()} disabled={disabled}>
+        {content}
       </button>
     );
   }
 
+  if (href && !disabled) {
+    return (
+      <Link href={href} className={getStyles()}>
+        {content}
+      </Link>
+    );
+  }
+
   return (
-    <Link href={href || "#"} className={getStyles()}>
-      <div className="flex items-center gap-3 flex-1">
-        {icon}
-        <span className="font-medium">{label}</span>
-      </div>
-      {isPro && (
-        <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-          Pro
-        </span>
-      )}
-    </Link>
+    <div className={getStyles()}>
+      {content}
+    </div>
   );
 } 

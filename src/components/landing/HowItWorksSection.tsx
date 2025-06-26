@@ -1,6 +1,7 @@
 import { FC } from "react";
-import { MessageSquare, Clock, Lightbulb, Award } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Plus, Archive, Settings, Activity, ArrowUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface HowItWorksSectionProps {
   isVisible: boolean;
@@ -8,102 +9,172 @@ interface HowItWorksSectionProps {
 
 export const HowItWorksSection: FC<HowItWorksSectionProps> = ({ isVisible }) => {
   return (
-    <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
+    <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-white/80 dark:bg-black/90">
       <div className="max-w-7xl mx-auto">
-        <div className={`text-center mb-12 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-3xl font-bold text-foreground font-sussie mb-4 hover:scale-105 transition-transform duration-300">
-            How It Works
+        {/* Section Header */}
+        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+            How <span className="text-slate-700 dark:text-slate-300">It Works</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Our comprehensive analysis process ensures your prompts achieve maximum effectiveness across all AI models.
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            Transform your AI workflow with professional prompt engineering tools
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Process Steps */}
-          <div className="space-y-8">
-            <div className={`flex items-start space-x-4 group hover:translate-x-2 transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} delay-500`}>
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-950/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-200 dark:group-hover:bg-blue-950/40 transition-all duration-300 group-hover:animate-bounce">
-                <span className="text-sm font-semibold text-blue-600">1</span>
+        {/* Workflow Steps */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16 md:mb-20">
+          {/* Step 1: Create & Organize */}
+          <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-200`}>
+            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
+              {/* Step Number */}
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">1</div>
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+                <Plus size={32} className="text-slate-700 dark:text-slate-300" />
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground font-sussie mb-2 group-hover:text-blue-600 transition-colors duration-300">
-                  Submit Your Prompt
-                </h3>
-                <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
-                  Paste or type your prompt into our intelligent analyzer. Our system accepts prompts of any length and complexity.
-                </p>
-              </div>
-            </div>
-
-            <div className={`flex items-start space-x-4 group hover:translate-x-2 transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} delay-700`}>
-              <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-950/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-green-200 dark:group-hover:bg-green-950/40 transition-all duration-300 group-hover:animate-bounce">
-                <span className="text-sm font-semibold text-green-600">2</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground font-sussie mb-2 group-hover:text-green-600 transition-colors duration-300">
-                  AI-Powered Analysis
-                </h3>
-                <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
-                  Multiple AI models evaluate your prompt across key metrics: clarity, context, format, and overall effectiveness.
-                </p>
-              </div>
-            </div>
-
-            <div className={`flex items-start space-x-4 group hover:translate-x-2 transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} delay-900`}>
-              <div className="flex-shrink-0 w-8 h-8 bg-purple-100 dark:bg-purple-950/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-200 dark:group-hover:bg-purple-950/40 transition-all duration-300 group-hover:animate-bounce">
-                <span className="text-sm font-semibold text-purple-600">3</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground font-sussie mb-2 group-hover:text-purple-600 transition-colors duration-300">
-                  Get Detailed Results
-                </h3>
-                <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
-                  Receive comprehensive scores, specific improvement suggestions, and optimized prompt rewrites.
-                </p>
-              </div>
-            </div>
-
-            <div className={`flex items-start space-x-4 group hover:translate-x-2 transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'} delay-1100`}>
-              <div className="flex-shrink-0 w-8 h-8 bg-orange-100 dark:bg-orange-950/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-orange-200 dark:group-hover:bg-orange-950/40 transition-all duration-300 group-hover:animate-bounce">
-                <span className="text-sm font-semibold text-orange-600">4</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground font-sussie mb-2 group-hover:text-orange-600 transition-colors duration-300">
-                  Implement & Track
-                </h3>
-                <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
-                  Use the optimized prompts and track their performance. Save successful prompts for future reference.
-                </p>
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+                Create & Organize
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 md:mb-8">
+                Build structured prompt templates with variables, organize them into collections, and create reusable frameworks for your team.
+              </p>
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Template builder with variable management</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Organized collections and folders</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Team collaboration features</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card className={`group p-4 bg-card border border-border text-center hover:shadow-lg hover:scale-105 hover:-rotate-1 transition-all duration-500 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-500`}>
-              <MessageSquare className="w-8 h-8 text-blue-600 mx-auto mb-3 group-hover:animate-bounce group-hover:scale-110 transition-all duration-300" />
-              <h4 className="font-semibold text-foreground font-sussie mb-2 group-hover:text-blue-600 transition-colors duration-300">Multi-Model Testing</h4>
-              <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">Test across 8+ AI models simultaneously</p>
-            </Card>
+          {/* Step 2: Test & Optimize */}
+          <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-400`}>
+            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
+              {/* Step Number */}
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">2</div>
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+                <Settings size={32} className="text-slate-700 dark:text-slate-300" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+                Test & Optimize
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 md:mb-8">
+                Run your prompts across multiple AI models simultaneously. Compare results, gather metrics, and optimize for the best performance.
+              </p>
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Multi-model testing (GPT-4, Claude, Gemini, Hugging Face, Together AI, and more)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">A/B testing and comparison tools</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Quality scoring and metrics</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <Card className={`group p-4 bg-card border border-border text-center hover:shadow-lg hover:scale-105 hover:rotate-1 transition-all duration-500 cursor-pointer hover:border-green-300 dark:hover:border-green-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-700`}>
-              <Clock className="w-8 h-8 text-green-600 mx-auto mb-3 group-hover:animate-spin group-hover:scale-110 transition-all duration-300" />
-              <h4 className="font-semibold text-foreground font-sussie mb-2 group-hover:text-green-600 transition-colors duration-300">Real-Time Analysis</h4>
-              <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">Get results in seconds, not minutes</p>
-            </Card>
+          {/* Step 3: Deploy & Scale */}
+          <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-600`}>
+            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
+              {/* Step Number */}
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">3</div>
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+                <Archive size={32} className="text-slate-700 dark:text-slate-300" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+                Deploy & Scale
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 md:mb-8">
+                Save your optimized prompts to your library, share with your team, and scale your AI operations with proven, tested templates.
+              </p>
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Persistent library storage</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Team sharing and collaboration</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-emerald-600 dark:bg-emerald-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">API access for automation</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            <Card className={`group p-4 bg-card border border-border text-center hover:shadow-lg hover:scale-105 hover:-rotate-1 transition-all duration-500 cursor-pointer hover:border-purple-300 dark:hover:border-purple-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-900`}>
-              <Lightbulb className="w-8 h-8 text-purple-600 mx-auto mb-3 group-hover:animate-pulse group-hover:scale-110 transition-all duration-300" />
-              <h4 className="font-semibold text-foreground font-sussie mb-2 group-hover:text-purple-600 transition-colors duration-300">Smart Suggestions</h4>
-              <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">AI-generated improvement recommendations</p>
-            </Card>
+        {/* Benefits Section */}
+        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-800`}>
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+            <div className="text-center mb-8 md:mb-12">
+              <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
+                The Promptly Advantage
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                See the immediate benefits of professional prompt engineering
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <Activity size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">3x</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Better Results</div>
+              </div>
+              
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <Archive size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">5x</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Faster Iteration</div>
+              </div>
+              
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <Settings size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">90%</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Consistency</div>
+              </div>
+              
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <ArrowUp size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">50%</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Cost Reduction</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            <Card className={`group p-4 bg-card border border-border text-center hover:shadow-lg hover:scale-105 hover:rotate-1 transition-all duration-500 cursor-pointer hover:border-orange-300 dark:hover:border-orange-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1100`}>
-              <Award className="w-8 h-8 text-orange-600 mx-auto mb-3 group-hover:animate-bounce group-hover:scale-110 transition-all duration-300" />
-              <h4 className="font-semibold text-foreground font-sussie mb-2 group-hover:text-orange-600 transition-colors duration-300">Performance Scores</h4>
-              <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">Detailed metrics and benchmarks</p>
-            </Card>
+        {/* Call to Action */}
+        <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1000`}>
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
+            <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+              Ready to Transform Your AI Workflow?
+            </h3>
+            <p className="text-slate-600 dark:text-slate-300 mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed">
+              Join professionals who are building better AI applications with systematic prompt engineering.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 text-white dark:text-slate-900 px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold rounded-lg shadow-sm transition-all duration-300">
+                Start Building
+                <ArrowUp size={20} className="ml-2" />
+              </Button>
+              <Button variant="outline" size="lg" className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold rounded-lg border-2 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300">
+                View Examples
+              </Button>
+            </div>
           </div>
         </div>
       </div>

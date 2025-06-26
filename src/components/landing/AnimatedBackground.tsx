@@ -1,28 +1,12 @@
-import { FC } from "react";
-import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import React from 'react';
 
-export const AnimatedBackground: FC = () => {
+const AnimatedBackground: React.FC = () => {
   return (
-    <>
-      {/* Animated Background Grid */}
-      <FlickeringGrid
-        className="absolute inset-0 z-0"
-        squareSize={4}
-        gridGap={6}
-        color="rgb(107, 114, 128)" // gray-500 for light mode
-        maxOpacity={0.1}
-        flickerChance={0.05}
-      />
-      
-      {/* Dark mode grid overlay */}
-      <FlickeringGrid
-        className="absolute inset-0 z-0 opacity-0 dark:opacity-100 transition-opacity duration-300"
-        squareSize={4}
-        gridGap={6}
-        color="rgb(156, 163, 175)" // gray-400 for dark mode
-        maxOpacity={0.15}
-        flickerChance={0.08}
-      />
-    </>
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-white dark:bg-slate-950">
+      {/* Completely solid background - no gradients or transparency */}
+      <div className="absolute inset-0 bg-white dark:bg-slate-950" />
+    </div>
   );
-}; 
+};
+
+export default AnimatedBackground; 

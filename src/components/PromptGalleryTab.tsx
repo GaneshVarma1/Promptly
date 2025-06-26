@@ -1,76 +1,271 @@
 "use client";
 
-import { GradientButton } from "@/components/ui/gradient-button";
-import { Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { 
+  Search, 
+  Copy, 
+  Star, 
+  FileText, 
+  Mail, 
+  Code, 
+  Briefcase,
+  Users,
+  BookOpen,
+  Zap,
+  ArrowRight
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { PROMPT_GALLERY_TEMPLATES } from "@/constants";
+
+interface Template {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+  icon: React.ReactNode;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  uses: number;
+}
+
+const templates: Template[] = [
+  {
+    id: 'email-professional',
+    title: 'Professional Email Writer',
+    description: 'Create polished business emails with proper tone and structure',
+    content: 'Write a professional email to [RECIPIENT] about [SUBJECT]. The tone should be [TONE: formal/friendly/urgent]. Include: [MAIN_POINTS]. End with [CALL_TO_ACTION].',
+    category: 'Business Communication',
+    icon: <Mail className="w-5 h-5" />,
+    difficulty: 'Beginner',
+    uses: 1250
+  },
+  {
+    id: 'code-review',
+    title: 'Code Review Assistant',
+    description: 'Get detailed feedback on code quality, performance, and best practices',
+    content: 'Review the following [LANGUAGE] code and provide feedback on:\n1. Code quality and readability\n2. Performance optimizations\n3. Security considerations\n4. Best practices\n5. Specific improvements\n\nCode:\n```\n[YOUR_CODE]\n```',
+    category: 'Development',
+    icon: <Code className="w-5 h-5" />,
+    difficulty: 'Intermediate',
+    uses: 890
+  },
+  {
+    id: 'product-description',
+    title: 'Product Description Generator',
+    description: 'Create compelling product descriptions that convert browsers to buyers',
+    content: 'Write a compelling product description for [PRODUCT_NAME], a [PRODUCT_TYPE] designed for [TARGET_AUDIENCE]. Highlight these key features: [FEATURES]. Include benefits, use cases, and a compelling call-to-action. Tone: [TONE].',
+    category: 'Marketing',
+    icon: <Briefcase className="w-5 h-5" />,
+    difficulty: 'Beginner',
+    uses: 650
+  },
+  {
+    id: 'meeting-summary',
+    title: 'Meeting Summary Creator',
+    description: 'Transform meeting notes into structured, actionable summaries',
+    content: 'Create a structured summary of this meeting:\n\nMeeting: [MEETING_TITLE]\nDate: [DATE]\nAttendees: [ATTENDEES]\nNotes: [MEETING_NOTES]\n\nPlease organize into:\n- Key Decisions\n- Action Items (with owners and deadlines)\n- Follow-up Required\n- Next Steps',
+    category: 'Business Communication',
+    icon: <Users className="w-5 h-5" />,
+    difficulty: 'Beginner',
+    uses: 420
+  },
+  {
+    id: 'learning-explainer',
+    title: 'Concept Explainer',
+    description: 'Break down complex topics into digestible explanations',
+    content: 'Explain [CONCEPT/TOPIC] to someone who is [AUDIENCE_LEVEL: beginner/intermediate/advanced] in [FIELD]. Use analogies, examples, and break it down into simple steps. Include:\n1. Simple definition\n2. Why it matters\n3. Real-world examples\n4. Common misconceptions\n5. Next steps to learn more',
+    category: 'Education',
+    icon: <BookOpen className="w-5 h-5" />,
+    difficulty: 'Intermediate',
+    uses: 320
+  },
+  {
+    id: 'content-optimizer',
+    title: 'Content Performance Optimizer',
+    description: 'Improve existing content for better engagement and SEO',
+    content: 'Analyze and optimize this content for better performance:\n\n[CONTENT]\n\nPlease provide:\n1. SEO improvements (keywords, meta descriptions)\n2. Readability enhancements\n3. Engagement optimization\n4. Structure improvements\n5. Call-to-action recommendations\n\nTarget audience: [AUDIENCE]\nGoal: [GOAL]',
+    category: 'Marketing',
+    icon: <Zap className="w-5 h-5" />,
+    difficulty: 'Advanced',
+    uses: 180
+  }
+];
+
+const categories = ['All', 'Business Communication', 'Development', 'Marketing', 'Education'];
+const difficulties = ['All', 'Beginner', 'Intermediate', 'Advanced'];
 
 export default function PromptGalleryTab() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = 
+      template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.category.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = selectedCategory === 'All' || template.category === selectedCategory;
+    const matchesDifficulty = selectedDifficulty === 'All' || template.difficulty === selectedDifficulty;
+    
+    return matchesSearch && matchesCategory && matchesDifficulty;
+  });
+
+  const handleUseTemplate = (template: Template) => {
+    // Create new document with template content
+    const newId = `doc-${Date.now()}`;
+    localStorage.setItem(`document-${newId}`, template.content);
+    localStorage.setItem(`title-${newId}`, template.title);
+    
+    // Trigger documents update
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('documents-updated'));
+    }
+    
+    router.push(`/results?id=${newId}`);
+  };
+
+  const handleCopyTemplate = (content: string) => {
+    navigator.clipboard.writeText(content);
+    // Could add a toast notification here
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Beginner': return 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400';
+      case 'Advanced': return 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400';
+      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400';
+    }
+  };
+
   return (
-    <div className="h-screen w-full bg-white dark:bg-black relative overflow-hidden">
-      {/* Grid background - light mode (grey lines) */}
-      <div 
-        className="absolute inset-0 w-full h-full opacity-20 dark:hidden"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(107, 114, 128, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(107, 114, 128, 0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px'
-        }}
-      />
-
-      {/* Grid background - dark mode (white lines) */}
-      <div 
-        className="absolute inset-0 w-full h-full opacity-30 hidden dark:block"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px'
-        }}
-      />
-
-      {/* Coming Soon content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full w-full px-4">
-        <div className="text-center max-w-md mx-auto">
-          {/* Icon with gradient */}
-          <div className="mb-6">
-            <svg className="w-16 h-16 mx-auto" viewBox="0 0 24 24" fill="none">
-              <defs>
-                <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#3b82f6" />
-                  <stop offset="100%" stopColor="#9333ea" />
-                </linearGradient>
-              </defs>
-              <path 
-                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 15.75l.394 1.183a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.183.394a2.25 2.25 0 00-1.423 1.423z" 
-                fill="url(#sparkleGradient)"
-              />
-            </svg>
-          </div>
-          
-          {/* Title */}
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 font-sussie">
-            Coming Soon
-          </h1>
-          
-          {/* Description */}
-          <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-            We're building a comprehensive prompt gallery to enhance your writing workflow.
-          </p>
-          
-          {/* CTA Button */}
-          <GradientButton className="px-6 py-3 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Notify Me
-          </GradientButton>
-
-          {/* Additional info */}
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-6">
-            Be the first to know when it launches
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Prompt Template Gallery
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
+            Professional templates to accelerate your prompt engineering
           </p>
         </div>
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4">
+          <div className="relative flex-1 min-w-[300px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Search templates..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
+          >
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+
+          <select
+            value={selectedDifficulty}
+            onChange={(e) => setSelectedDifficulty(e.target.value)}
+            className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
+          >
+            {difficulties.map(difficulty => (
+              <option key={difficulty} value={difficulty}>{difficulty}</option>
+            ))}
+          </select>
+        </div>
       </div>
+
+      {/* Templates Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filteredTemplates.map((template) => (
+          <Card key={template.id} className="group hover:shadow-md transition-all duration-200 border border-gray-200 dark:border-gray-700">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    {template.icon}
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      {template.category}
+                    </div>
+                    <Badge className={`text-xs ${getDifficultyColor(template.difficulty)}`}>
+                      {template.difficulty}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {template.uses} uses
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  {template.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  {template.description}
+                </p>
+                
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 mb-4">
+                  <p className="text-xs text-gray-700 dark:text-gray-300 font-mono line-clamp-3">
+                    {template.content}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => handleCopyTemplate(template.content)}
+                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" 
+                  title="Copy template"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+                
+                <Button 
+                  onClick={() => handleUseTemplate(template)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                >
+                  Use Template
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {filteredTemplates.length === 0 && (
+        <div className="text-center py-12">
+          <FileText className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            No templates found
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Try adjusting your search or filter criteria
+          </p>
+        </div>
+      )}
     </div>
   );
 } 

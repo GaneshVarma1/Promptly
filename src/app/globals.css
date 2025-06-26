@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cache buster - force reload of styles */
+
+/* Force white/dark backgrounds - override any browser defaults */
+* {
+  box-sizing: border-box;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
@@ -201,6 +213,32 @@
 
   body {
     @apply bg-background text-foreground font-sussie;
+    /* Ensure consistent background during scroll */
+    background-color: white !important;
+    min-height: 100vh;
+    overflow-x: hidden;
+    /* Prevent over-scroll/rubber band effect */
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
+  }
+  
+  body.dark {
+    background-color: #020617 !important; /* slate-950 */
+  }
+
+  html {
+    @apply bg-background;
+    /* Ensure no browser default blue background shows through */
+    background-color: white !important;
+    /* Prevent over-scroll/rubber band effect */
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
+  }
+  
+  html.dark {
+    background-color: #020617 !important; /* slate-950 */
   }
 
   /* Apply Font Sussie (Inter) to all text elements */
@@ -216,6 +254,24 @@
   /* Optimize for smoother hydration */
   html {
     scroll-behavior: smooth;
+    /* Additional scroll control */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  /* Override any potential viewport-related blue backgrounds */
+  body, html, #__next, [data-reactroot] {
+    background-color: white !important;
+    /* Prevent over-scroll on all containers */
+    overscroll-behavior: none;
+  }
+
+  .dark body, 
+  .dark html, 
+  .dark #__next, 
+  .dark [data-reactroot] {
+    background-color: #020617 !important; /* slate-950 */
+    overscroll-behavior: none;
   }
   
   /* Ensure consistent header height during loading */
@@ -250,6 +306,31 @@
   
   .animate-pulse {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Framer-style launch text animation */
+  @keyframes slide-up-fade {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-up-fade {
+    animation: slide-up-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-fill-mode: both;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+  .animate-blink {
+    animation: blink 1s infinite;
   }
 }
 

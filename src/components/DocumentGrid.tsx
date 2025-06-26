@@ -8,9 +8,17 @@ interface DocumentGridProps {
   onDelete: (id: string) => void;
   onOpen: (id: string) => void;
   onToggleSave: (id: string) => void;
+  isTrashMode?: boolean;
 }
 
-export const DocumentGrid: React.FC<DocumentGridProps> = ({ documents, getIsSaved, onDelete, onOpen, onToggleSave }) => {
+export const DocumentGrid: React.FC<DocumentGridProps> = ({ 
+  documents, 
+  getIsSaved, 
+  onDelete, 
+  onOpen, 
+  onToggleSave, 
+  isTrashMode = false 
+}) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {documents.map((doc) => (
@@ -21,6 +29,7 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({ documents, getIsSave
           onDelete={onDelete}
           onOpen={onOpen}
           onToggleSave={onToggleSave}
+          isTrashMode={isTrashMode}
         />
       ))}
     </div>

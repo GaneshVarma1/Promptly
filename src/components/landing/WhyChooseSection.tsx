@@ -1,6 +1,7 @@
 import { FC } from "react";
-import { Brain, Target, Zap, CheckCircle } from "lucide-react";
+import { Settings, Activity, Star, Check, Archive } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface WhyChooseSectionProps {
   isVisible: boolean;
@@ -8,90 +9,181 @@ interface WhyChooseSectionProps {
 
 export const WhyChooseSection: FC<WhyChooseSectionProps> = ({ isVisible }) => {
   return (
-    <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8">
+    <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-slate-50/30 dark:bg-black/90">
       <div className="max-w-7xl mx-auto">
-        <div className={`text-center mb-12 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-3xl font-bold text-foreground font-sussie mb-4 hover:scale-105 transition-transform duration-300">
-            Why Choose This Tool?
+        {/* Section Header */}
+        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+            Why Choose <span className="text-slate-700 dark:text-slate-300">Promptly</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Don't become another casualty of poor AI practices. Master strategic prompting to future-proof your career and deliver exceptional results.
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            Move beyond basic prompting to professional-grade AI workflow management
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Feature Cards with stagger animation */}
-          <Card className={`group p-6 bg-card border border-border hover:shadow-xl hover:scale-105 transition-all duration-500 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-500`}>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-950/40 transition-colors duration-300 group-hover:scale-110 group-hover:rotate-3">
-                <Brain className="w-6 h-6 text-blue-600 group-hover:animate-pulse" />
+        {/* True Bento Grid Layout */}
+        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 md:auto-rows-[minmax(180px,auto)] gap-2 md:gap-3 mb-16 md:mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          {/* 2x2 Card: End Shallow Prompting */}
+          <div className="group md:col-span-2 md:row-span-2">
+            <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/20 dark:bg-black/70 border border-slate-200 dark:border-white/10 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/25 transition-all duration-300 rounded-2xl hover:bg-white/25 dark:hover:bg-black/80">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/60 dark:bg-slate-800/60 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/60 dark:group-hover:bg-slate-700/60 transition-colors duration-300 backdrop-blur-sm border border-white/30 dark:border-white/15">
+                <Settings size={32} className="text-slate-700 dark:text-slate-300" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground font-sussie group-hover:text-blue-600 transition-colors duration-300">
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
                 End Shallow Prompting
               </h3>
-            </div>
-            <p className="text-muted-foreground mb-4 group-hover:text-foreground/80 transition-colors duration-300">
-              Move beyond basic "write this email" requests. Our analysis ensures your prompts include critical business context, specific requirements, and measurable outcomes.
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-center text-sm text-muted-foreground group-hover:translate-x-2 transition-transform duration-300">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                Real-time scoring system
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground group-hover:translate-x-2 transition-transform duration-300 delay-75">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                Multi-model compatibility
-              </li>
-            </ul>
-          </Card>
-
-          <Card className={`group p-6 bg-card border border-border hover:shadow-xl hover:scale-105 transition-all duration-500 cursor-pointer hover:border-green-300 dark:hover:border-green-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-700`}>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2 bg-green-50 dark:bg-green-950/20 rounded-lg group-hover:bg-green-100 dark:group-hover:bg-green-950/40 transition-colors duration-300 group-hover:scale-110 group-hover:rotate-3">
-                <Target className="w-6 h-6 text-green-600 group-hover:animate-pulse" />
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 md:mb-8">
+                Replace one-off prompting with systematic, reusable templates designed for consistent enterprise results.
+              </p>
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-start gap-3">
+                  <Check size={20} className="text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100 text-sm">Structured Templates</div>
+                    <div className="text-xs md:text-sm text-slate-600 dark:text-slate-400">Pre-built professional frameworks</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Check size={20} className="text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100 text-sm">Variable Management</div>
+                    <div className="text-xs md:text-sm text-slate-600 dark:text-slate-400">Dynamic, context-aware prompts</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Check size={20} className="text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100 text-sm">Quality Standards</div>
+                    <div className="text-xs md:text-sm text-slate-600 dark:text-slate-400">Enterprise-grade consistency</div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-foreground font-sussie group-hover:text-green-600 transition-colors duration-300">
+            </div>
+          </div>
+
+          {/* 1x2 Card: Performance Analytics */}
+          <div className="group md:col-span-1 md:row-span-2">
+            <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/20 dark:bg-black/70 border border-slate-200 dark:border-white/10 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/25 transition-all duration-300 rounded-2xl hover:bg-white/25 dark:hover:bg-black/80">
+              <div className="w-12 h-12 bg-slate-100/60 dark:bg-slate-800/60 rounded-lg flex items-center justify-center mb-4 group-hover:bg-slate-200/60 dark:group-hover:bg-slate-700/60 transition-colors duration-300 backdrop-blur-sm border border-white/30 dark:border-white/15">
+                <Activity size={28} className="text-slate-700 dark:text-slate-300" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-3 tracking-tight">
+                Performance Analytics
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                Comprehensive metrics and insights for data-driven optimization.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs text-slate-600 dark:text-slate-400">Quality scoring</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs text-slate-600 dark:text-slate-400">ROI tracking</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs text-slate-600 dark:text-slate-400">Custom dashboards</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs text-slate-600 dark:text-slate-400">Exportable reports</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs text-slate-600 dark:text-slate-400">Real-time monitoring</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 1x1 Card: Build Critical Thinking */}
+          <div className="group md:col-span-1 md:row-span-1">
+            <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/20 dark:bg-black/70 border border-slate-200 dark:border-white/10 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/25 transition-all duration-300 rounded-2xl hover:bg-white/25 dark:hover:bg-black/80">
+              <div className="w-12 h-12 bg-slate-100/60 dark:bg-slate-800/60 rounded-lg flex items-center justify-center mb-4 group-hover:bg-slate-200/60 dark:group-hover:bg-slate-700/60 transition-colors duration-300 backdrop-blur-sm border border-white/30 dark:border-white/15">
+                <Activity size={28} className="text-slate-700 dark:text-slate-300" />
+              </div>
+              <h3 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 tracking-tight">
                 Build Critical Thinking
               </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                Develop analytical skills through multi-model testing and systematic optimization approaches.
+              </p>
             </div>
-            <p className="text-muted-foreground mb-4 group-hover:text-foreground/80 transition-colors duration-300">
-              Don't just use AI—understand it. Learn to craft prompts that encourage deeper analysis, challenge assumptions, and produce thoughtful, nuanced responses.
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-center text-sm text-muted-foreground group-hover:translate-x-2 transition-transform duration-300">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                Detailed improvement suggestions
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground group-hover:translate-x-2 transition-transform duration-300 delay-75">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                Context-aware recommendations
-              </li>
-            </ul>
-          </Card>
+          </div>
 
-          <Card className={`group p-6 bg-card border border-border hover:shadow-xl hover:scale-105 transition-all duration-500 cursor-pointer hover:border-purple-300 dark:hover:border-purple-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-900`}>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2 bg-purple-50 dark:bg-purple-950/20 rounded-lg group-hover:bg-purple-100 dark:group-hover:bg-purple-950/40 transition-colors duration-300 group-hover:scale-110 group-hover:rotate-3">
-                <Zap className="w-6 h-6 text-purple-600 group-hover:animate-pulse" />
+          {/* 1x1 Card: Professional Development */}
+          <div className="group md:col-span-1 md:row-span-1">
+            <div className="p-4 md:p-6 h-full backdrop-blur-xl bg-white/20 dark:bg-black/70 border border-slate-200 dark:border-white/10 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/25 transition-all duration-300 rounded-2xl hover:bg-white/25 dark:hover:bg-black/80">
+              <div className="w-10 h-10 bg-slate-100/60 dark:bg-slate-800/60 rounded-lg flex items-center justify-center mb-3 group-hover:bg-slate-200/60 dark:group-hover:bg-slate-700/60 transition-colors duration-300 backdrop-blur-sm border border-white/30 dark:border-white/15">
+                <Star size={24} className="text-slate-700 dark:text-slate-300" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground font-sussie group-hover:text-purple-600 transition-colors duration-300">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50 mb-2 tracking-tight">
                 Professional Development
               </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300">
+                Advance your AI expertise with enterprise tools.
+              </p>
             </div>
-            <p className="text-muted-foreground mb-4 group-hover:text-foreground/80 transition-colors duration-300">
-              Accelerate your career with advanced AI skills. Master sophisticated prompting techniques that set you apart in a competitive job market.
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-center text-sm text-muted-foreground group-hover:translate-x-2 transition-transform duration-300">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                Multiple rewrite variations
-              </li>
-              <li className="flex items-center text-sm text-muted-foreground group-hover:translate-x-2 transition-transform duration-300 delay-75">
-                <CheckCircle className="w-4 h-4 text-green-500 mr-2 group-hover:scale-110 transition-transform duration-200" />
-                Performance tracking
-              </li>
-            </ul>
-          </Card>
+          </div>
+
+          {/* 2x1 Card: Multi-Model Testing */}
+          <div className="group md:col-span-2 md:row-span-1">
+            <div className="p-4 md:p-6 h-full backdrop-blur-xl bg-white/20 dark:bg-black/70 border border-slate-200 dark:border-white/10 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/25 transition-all duration-300 rounded-2xl hover:bg-white/25 dark:hover:bg-black/80">
+              <div className="w-10 h-10 bg-slate-100/60 dark:bg-slate-800/60 rounded-lg flex items-center justify-center mb-3 group-hover:bg-slate-200/60 dark:group-hover:bg-slate-700/60 transition-colors duration-300 backdrop-blur-sm border border-white/30 dark:border-white/15">
+                <Archive size={24} className="text-slate-700 dark:text-slate-300" />
+              </div>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-50 mb-2 tracking-tight">
+                Multi-Model Testing
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300">
+                Test across GPT-4, Claude, Gemini, and many free models from Hugging Face and Together AI. Access a wide range of open-source and community models for maximum flexibility.
+              </p>
+            </div>
+          </div>
+
+          {/* 2x1 Card: Platform Comparison */}
+          <div className="group md:col-span-2 md:row-span-1">
+            <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/20 dark:bg-black/70 border border-slate-200 dark:border-white/10 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/25 transition-all duration-300 rounded-2xl hover:bg-white/25 dark:hover:bg-black/80">
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
+                Platform Comparison
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 mb-6">
+                See how Promptly compares to consumer AI interfaces
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">No prompt organization</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Single model lock-in</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">No analytics</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Professional templates</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Multi-model testing</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Advanced analytics</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
