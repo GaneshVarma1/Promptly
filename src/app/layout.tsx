@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter, JetBrains_Mono, League_Spartan } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Suspense } from "react";
@@ -19,12 +19,26 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-const leagueSpartan = League_Spartan({
-  variable: "--font-league-spartan",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  display: 'swap',
-});
+// Try to load League Spartan with fallback
+let leagueSpartan: any = null;
+try {
+  // Dynamic import to avoid build failures
+  const { League_Spartan } = require("next/font/google");
+  leagueSpartan = League_Spartan({
+    variable: "--font-league-spartan",
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700", "800", "900"],
+    display: 'swap',
+    fallback: ['system-ui', 'Arial', 'sans-serif'],
+  });
+} catch (error) {
+  console.warn('League Spartan font failed to load, using fallback:', error);
+  // Create a fallback font object
+  leagueSpartan = {
+    variable: "--font-league-spartan",
+    style: { fontFamily: 'system-ui, Arial, sans-serif' }
+  };
+}
 
 export const metadata: Metadata = {
   title: "Refine AI Write - Prompt Analysis Tool",
@@ -63,7 +77,11 @@ export default function RootLayout({
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
     >
-      <html lang="en" suppressHydrationWarning>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        style={{ backgroundColor: "#020617", colorScheme: "dark" }}
+      >
         <head>
           <Script
             id="theme-script"
@@ -168,7 +186,11 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${inter.variable} ${jetbrainsMono.variable} ${leagueSpartan.variable} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
+          className={`${inter.variable} ${jetbrainsMono.variable} ${leagueSpartan?.variable || ''} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
+          style={{ 
+            backgroundColor: "#020617",
+            fontFamily: 'var(--font-league-spartan)'
+          }}
         >
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
