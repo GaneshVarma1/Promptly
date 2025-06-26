@@ -38,7 +38,7 @@ export default function Home() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-slate-300 dark:border-slate-600"></div>
       </div>
     );
   }
@@ -46,9 +46,9 @@ export default function Home() {
   // If user is signed in, they'll be redirected to dashboard
   // This page only shows for non-authenticated users
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background" style={{ overscrollBehavior: 'none' }}>
       <Header />
-      <main>
+      <main className="bg-background" style={{ overscrollBehavior: 'none' }}>
         <LandingPage 
           onGetStarted={handleGetStarted}
           onPromptSubmit={handlePromptSubmit}

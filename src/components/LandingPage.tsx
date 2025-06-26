@@ -5,7 +5,8 @@ import {
   WhyChooseSection,
   HowItWorksSection,
   BenefitsSection,
-  AnimatedBackground
+  AnimatedBackground,
+  Footer
 } from "@/components/landing";
 
 /**
@@ -39,7 +40,8 @@ const LandingPage: FC<LandingPageProps> = ({ onGetStarted, onPromptSubmit }) => 
       
       <HowItWorksSection isVisible={isVisible} />
       
-      <BenefitsSection isVisible={isVisible} onGetStarted={onGetStarted} />
+      <BenefitsSection isVisible={isVisible} />
+      <Footer />
     </div>
   );
 };

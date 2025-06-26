@@ -73,9 +73,8 @@ export default function RootLayout({
                 (function() {
                   try {
                     const theme = localStorage.getItem('promptly-theme');
-                    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    const shouldUseDark = theme === 'dark' || (!theme && prefersDark);
-                    
+                    // Default to dark mode unless user explicitly chose light
+                    const shouldUseDark = theme !== 'light';
                     if (shouldUseDark) {
                       document.documentElement.classList.add('dark');
                       document.documentElement.style.colorScheme = 'dark';
@@ -83,8 +82,6 @@ export default function RootLayout({
                       document.documentElement.classList.remove('dark');
                       document.documentElement.style.colorScheme = 'light';
                     }
-                    
-                    // Set initial variables to prevent flash
                     document.documentElement.style.setProperty('--initial-theme', shouldUseDark ? 'dark' : 'light');
                   } catch (e) {
                     console.warn('Theme initialization failed:', e);
@@ -171,11 +168,11 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${inter.variable} ${jetbrainsMono.variable} ${leagueSpartan.variable} antialiased bg-background text-foreground font-sussie`}
+          className={`${inter.variable} ${jetbrainsMono.variable} ${leagueSpartan.variable} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
         >
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-2 border-slate-300 dark:border-slate-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           }>
             {children}

@@ -1,228 +1,368 @@
-import { FC } from "react";
-import { ArrowRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { FC, useState, useEffect } from "react";
+import { AlertTriangle, Heart, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Silk from "@/components/ui/silk";
 
 interface ProblemStatementSectionProps {
   isVisible: boolean;
 }
 
+interface CountUpProps {
+  end: number;
+  duration?: number;
+  suffix?: string;
+  isVisible?: boolean;
+}
+
+const CountUp: FC<CountUpProps> = ({ end, duration = 2000, suffix = "%", isVisible = false }) => {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    if (isVisible && !hasStarted) {
+      console.log(`Starting CountUp animation to ${end}%`);
+      setHasStarted(true);
+      setCount(0); // Reset to 0 when starting
+      
+      // Small delay to ensure proper timing
+      setTimeout(() => {
+        let startTime: number;
+        let animationFrame: number;
+
+        const animate = (currentTime: number) => {
+          if (!startTime) startTime = currentTime;
+          const progress = Math.min((currentTime - startTime) / duration, 1);
+          
+          // Easing function for smooth animation
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+          const currentCount = Math.floor(easeOutQuart * end);
+          
+          setCount(currentCount);
+          
+          if (progress < 1) {
+            animationFrame = requestAnimationFrame(animate);
+          }
+        };
+
+        // Start animation immediately
+        animationFrame = requestAnimationFrame(animate);
+
+        return () => {
+          if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+          }
+        };
+      }, 100); // Small delay to ensure proper timing
+    }
+  }, [isVisible, hasStarted, end, duration]);
+
+  // Reset when section becomes invisible
+  useEffect(() => {
+    if (!isVisible) {
+      setHasStarted(false);
+      setCount(0);
+    }
+  }, [isVisible]);
+
+  return <span>{count}{suffix}</span>;
+};
+
 export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVisible }) => {
   return (
-    <section className="relative z-10 py-20 px-4 sm:px-6 lg:px-8">
+    <section className="relative -mt-12 z-20 py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-slate-50/50 dark:bg-black/80">
       <div className="max-w-7xl mx-auto">
-        {/* Main Problem Statement */}
-        <div className={`text-center mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground font-sussie mb-6 hover:scale-105 transition-transform duration-300 leading-tight">
-            Stop Wasting Time with <span className="text-red-600 relative">Shallow Prompting</span>
+        {/* Section Header */}
+        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+            The <span className="text-slate-700 dark:text-slate-300">Problem</span> with Current AI Tools
           </h2>
-          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            While others struggle with generic, ineffective prompts, you'll master the art of precise AI communication that delivers professional-grade results every time.
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            Most professionals are stuck using consumer-grade AI interfaces that weren't designed for serious development work
           </p>
         </div>
 
-        {/* Before vs After Comparison - Enhanced Professional Design */}
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 mb-20 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} lg:items-start`}>
-          {/* BEFORE - Poor Example */}
-          <div className="relative group h-full">
-            {/* Futuristic Decorative Elements */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-2xl blur-sm group-hover:blur-md transition-all duration-500 opacity-60 animate-pulse"></div>
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 rounded-xl transform group-hover:scale-[1.02] transition-all duration-500"></div>
-            
-            {/* Futuristic Grid Pattern */}
-            <div className="absolute inset-0 opacity-10 dark:opacity-5">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `linear-gradient(rgba(239, 68, 68, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.1) 1px, transparent 1px)`,
-                backgroundSize: '20px 20px'
-              }}></div>
+        {/* Problem Identification Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-16 md:mb-20">
+          {/* Problem 1: No Structure */}
+          <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-200`}>
+            <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-orange-100/80 dark:bg-black/60 border border-orange-200/60 dark:border-red-700/60 hover:shadow-2xl hover:border-orange-300 dark:hover:border-red-500 transition-all duration-300 rounded-2xl hover:bg-orange-200/80 dark:hover:bg-black/80">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-orange-200/80 dark:bg-red-800/80 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-orange-300/80 dark:group-hover:bg-red-700/80 transition-colors duration-300 backdrop-blur-sm border border-orange-300/60 dark:border-red-600/60">
+                <AlertTriangle size={32} className="text-orange-600 dark:text-orange-400" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+                No Structure or Organization
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 md:mb-8">
+                Chat interfaces encourage one-off conversations without any way to organize, save, or systematically improve your prompts.
+              </p>
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Lost conversations and prompts</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">No reusable templates</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Constant reinvention of the wheel</span>
+                </div>
+              </div>
+            </div>
             </div>
             
-            <Card className="relative bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border-2 border-red-200/50 dark:border-red-800/50 p-4 sm:p-6 lg:p-8 rounded-xl shadow-lg group-hover:shadow-2xl transition-all duration-500 overflow-hidden h-full flex flex-col">
-              {/* Status Badge - Mobile Responsive */}
-              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6 z-10">
-                <div className="flex items-center space-x-1.5 sm:space-x-2 bg-red-50/95 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700 px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 rounded-full text-xs sm:text-sm font-medium shadow-sm backdrop-blur-sm">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full animate-pulse"></div>
-                  <span>AVOID</span>
+          {/* Problem 2: Limited Testing */}
+          <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-400`}>
+            <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-orange-100/80 dark:bg-black/60 border border-orange-200/60 dark:border-red-700/60 hover:shadow-2xl hover:border-orange-300 dark:hover:border-red-500 transition-all duration-300 rounded-2xl hover:bg-orange-200/80 dark:hover:bg-black/80">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-orange-200/80 dark:bg-red-800/80 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-orange-300/80 dark:group-hover:bg-red-700/80 transition-colors duration-300 backdrop-blur-sm border border-orange-300/60 dark:border-red-600/60">
+                <Heart size={32} className="text-orange-600 dark:text-orange-400" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+                Single-Model Limitations
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 md:mb-8">
+                Consumer tools lock you into one AI model, preventing you from finding the best AI for each specific task or use case.
+              </p>
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">No model comparison</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Suboptimal results</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Vendor lock-in dependency</span>
                 </div>
               </div>
-
-              {/* Warning Icon */}
-              <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
-                <div className="p-2 sm:p-3 bg-red-100 dark:bg-red-900/30 rounded-full group-hover:animate-pulse">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
+            </div>
                 </div>
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-red-700 dark:text-red-400 font-sussie">
-                  Shallow Prompting
-                </h3>
-              </div>
 
-              {/* Prompt Example */}
-              <div className="mb-4 sm:mb-6 relative">
-                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 sm:p-4 lg:p-6 rounded-lg border border-red-200/50 dark:border-red-700/50 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500"></div>
-                  <div className="flex items-start space-x-2 sm:space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                      <span className="text-red-600 text-xs sm:text-sm font-bold">✗</span>
+          {/* Problem 3: No Analytics */}
+          <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-600`}>
+            <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-orange-100/80 dark:bg-black/60 border border-orange-200/60 dark:border-red-700/60 hover:shadow-2xl hover:border-orange-300 dark:hover:border-red-500 transition-all duration-300 rounded-2xl hover:bg-orange-200/80 dark:hover:bg-black/80">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-orange-200/80 dark:bg-red-800/80 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-orange-300/80 dark:group-hover:bg-red-700/80 transition-colors duration-300 backdrop-blur-sm border border-orange-300/60 dark:border-red-600/60">
+                <AlertTriangle size={32} className="text-orange-600 dark:text-orange-400" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+                No Performance Insights
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6 md:mb-8">
+                Without analytics or metrics, you can't improve systematically or prove ROI to stakeholders and clients.
+              </p>
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">No quality metrics</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Can't track improvements</span>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-red-700 dark:text-red-400 font-semibold text-xs sm:text-sm uppercase tracking-wide mb-2">Poor Example</div>
-                      <div className="font-mono text-xs sm:text-sm text-muted-foreground italic leading-relaxed bg-white dark:bg-zinc-900 p-2 sm:p-3 rounded border border-red-200/30 dark:border-red-700/30 break-words">
-                        "Write an email to my team about the project update"
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-orange-500 dark:bg-red-400 rounded-full flex-shrink-0"></div>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">No ROI visibility</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Issues List */}
-              <div className="space-y-3 flex-1">
-                <h4 className="text-sm font-semibold text-red-700 dark:text-red-400 uppercase tracking-wide">Critical Issues</h4>
-                {[
-                  'No context or specifics provided',
-                  'Vague, unfocused output expected',
-                  'Requires multiple revision cycles',
-                  'Unprofessional, generic results'
-                ].map((issue, index) => (
-                  <div key={index} className="flex items-center space-x-3 text-sm text-red-600 dark:text-red-400 transform group-hover:translate-x-1 transition-transform duration-300" style={{ transitionDelay: `${index * 50}ms` }}>
-                    <div className="flex-shrink-0 w-5 h-5 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+        {/* Enterprise Solution Section */}
+        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-800`}>
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+            <div className="text-center mb-8 md:mb-12">
+              <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
+                The Enterprise Solution
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                Promptly addresses these fundamental limitations with professional-grade tooling
+              </p>
                     </div>
-                    <span>{issue}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Quality Score */}
-              <div className="mt-6 pt-6 border-t border-red-200/50 dark:border-red-700/50">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-red-700 dark:text-red-400">Quality Score</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-16 h-2 bg-red-100 dark:bg-red-900/30 rounded-full overflow-hidden">
-                      <div className="w-3 h-full bg-red-500 rounded-full"></div>
-                    </div>
-                    <span className="text-sm font-bold text-red-600">2/10</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* AFTER - Good Example */}
-          <div className="relative group h-full">
-            {/* Futuristic Decorative Elements */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl blur-sm group-hover:blur-md transition-all duration-500 opacity-60 animate-pulse"></div>
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-xl transform group-hover:scale-[1.02] transition-all duration-500"></div>
             
-            {/* Futuristic Grid Pattern */}
-            <div className="absolute inset-0 opacity-10 dark:opacity-5">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)`,
-                backgroundSize: '20px 20px'
-              }}></div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+              {/* Solution 1 */}
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
+                <Check size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-4 md:mb-6" />
+                <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 md:mb-4">
+                  Organized Libraries
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Systematic organization with collections, tags, and version control for all your AI assets
+                </p>
+                  </div>
+              
+              {/* Solution 2 */}
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
+                <Check size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-4 md:mb-6" />
+                <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 md:mb-4">
+                  Multi-Model Testing
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Test across GPT-4, Claude, Gemini, and more to find the optimal AI for each task
+                </p>
+              </div>
+
+              {/* Solution 3 */}
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
+                <Check size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-4 md:mb-6" />
+                <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 md:mb-4">
+                  Advanced Analytics
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Comprehensive metrics, performance tracking, and ROI analysis for data-driven optimization
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Statistics Showcase */}
+        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1000`}>
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+            <div className="text-center mb-8 md:mb-12">
+              <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
+                The Cost of Inefficiency
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                See how much time and money professionals waste with amateur AI approaches
+              </p>
             </div>
             
-            <Card className="relative bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border-2 border-green-200/50 dark:border-green-800/50 p-4 sm:p-6 lg:p-8 rounded-xl shadow-lg group-hover:shadow-2xl transition-all duration-500 overflow-hidden h-full flex flex-col">
-              {/* Status Badge - Mobile Responsive */}
-              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6 z-10">
-                <div className="flex items-center space-x-1.5 sm:space-x-2 bg-green-50/95 dark:bg-green-950/40 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700 px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 rounded-full text-xs sm:text-sm font-medium shadow-sm backdrop-blur-sm">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="hidden sm:inline">RECOMMENDED</span>
-                  <span className="sm:hidden">✓ GOOD</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <AlertTriangle size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
+                  <CountUp end={70} isVisible={isVisible} />
                 </div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Time Wasted on Recreation</div>
+                </div>
+              
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <Heart size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
+                  <CountUp end={40} isVisible={isVisible} />
+                </div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Higher AI Costs</div>
               </div>
 
-              {/* Success Icon */}
-              <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
-                <div className="p-2 sm:p-3 bg-green-100 dark:bg-green-900/30 rounded-full group-hover:animate-pulse">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <AlertTriangle size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
+                  <CountUp end={60} isVisible={isVisible} />
                 </div>
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-400 font-sussie">
-                  Strategic Prompting
-                </h3>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Inconsistent Quality</div>
               </div>
 
-              {/* Prompt Example */}
-              <div className="mb-4 sm:mb-6 relative">
-                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 sm:p-4 lg:p-6 rounded-lg border border-green-200/50 dark:border-green-700/50 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-emerald-500"></div>
-                  <div className="flex items-start space-x-2 sm:space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                      <span className="text-green-600 text-xs sm:text-sm font-bold">✓</span>
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <Heart size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
+                  <CountUp end={0} isVisible={isVisible} />
+                </div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">ROI Visibility</div>
+              </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-green-700 dark:text-green-400 font-semibold text-xs sm:text-sm uppercase tracking-wide mb-2">Best Practice</div>
-                      <div className="font-mono text-xs sm:text-sm text-muted-foreground leading-relaxed bg-white dark:bg-zinc-900 p-2 sm:p-3 lg:p-4 rounded border border-green-200/30 dark:border-green-700/30 break-words">
-                        "Draft a project status email for my development team (8 engineers) about our Q4 mobile app release. Include: current sprint progress, 3 key blockers we resolved this week, upcoming milestone deadlines, and action items for each team member. Tone: professional but encouraging, as we're slightly behind schedule but making good progress."
                       </div>
                     </div>
+
+        {/* Solution Benefits */}
+        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1200`}>
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+            <div className="text-center mb-8 md:mb-12">
+              <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
+                Transform Your AI Workflow
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                Move from amateur experimentation to professional AI development
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+              {/* Before */}
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                  <h4 className="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-200">Before: Amateur Approach</h4>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg mt-0.5">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Recreate prompts from memory</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg mt-0.5">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Limited to one AI model</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg mt-0.5">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">No quality measurements</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg mt-0.5">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Trial and error optimization</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-600 dark:text-orange-400 text-lg mt-0.5">✗</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">No team collaboration</span>
                   </div>
                 </div>
               </div>
 
-              {/* Benefits List */}
-              <div className="space-y-3 flex-1">
-                <h4 className="text-sm font-semibold text-green-700 dark:text-green-400 uppercase tracking-wide">Key Strengths</h4>
-                {[
-                  'Specific context & target audience',
-                  'Clear structure & requirements',
-                  'Defined tone & communication style',
-                  'Professional, ready-to-use output'
-                ].map((benefit, index) => (
-                  <div key={index} className="flex items-center space-x-3 text-sm text-green-600 dark:text-green-400 transform group-hover:translate-x-1 transition-transform duration-300" style={{ transitionDelay: `${index * 50}ms` }}>
-                    <div className="flex-shrink-0 w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              {/* After */}
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-3 h-3 bg-emerald-600 rounded-full animate-pulse"></div>
+                  <h4 className="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-200">After: Professional Method</h4>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Reusable template library</span>
                     </div>
-                    <span>{benefit}</span>
+                  <div className="flex items-start gap-3">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Multi-model testing and comparison</span>
                   </div>
-                ))}
+                  <div className="flex items-start gap-3">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Performance analytics and metrics</span>
               </div>
-
-              {/* Quality Score */}
-              <div className="mt-6 pt-6 border-t border-green-200/50 dark:border-green-700/50">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-green-700 dark:text-green-400">Quality Score</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-16 h-2 bg-green-100 dark:bg-green-900/30 rounded-full overflow-hidden">
-                      <div className="w-14 h-full bg-green-500 rounded-full"></div>
+                  <div className="flex items-start gap-3">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Data-driven optimization</span>
                     </div>
-                    <span className="text-sm font-bold text-green-600">9/10</span>
+                  <div className="flex items-start gap-3">
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Enterprise team collaboration</span>
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
           </div>
         </div>
 
-        {/* Impact Metrics */}
-        <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <Card className="p-6 text-center bg-card border border-border hover:shadow-lg hover:scale-105 transition-all duration-300 group">
-            <div className="text-3xl font-bold text-blue-600 mb-2 group-hover:scale-110 transition-transform duration-300">5x</div>
-            <div className="text-sm font-medium text-foreground mb-1">Better Results</div>
-            <div className="text-xs text-muted-foreground">With structured prompts</div>
-          </Card>
-          <Card className="p-6 text-center bg-card border border-border hover:shadow-lg hover:scale-105 transition-all duration-300 group">
-            <div className="text-3xl font-bold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300">80%</div>
-            <div className="text-sm font-medium text-foreground mb-1">Less Revision</div>
-            <div className="text-xs text-muted-foreground">Time saved on edits</div>
-          </Card>
-          <Card className="p-6 text-center bg-card border border-border hover:shadow-lg hover:scale-105 transition-all duration-300 group">
-            <div className="text-3xl font-bold text-purple-600 mb-2 group-hover:scale-110 transition-transform duration-300">95%</div>
-            <div className="text-sm font-medium text-foreground mb-1">Satisfaction Rate</div>
-            <div className="text-xs text-muted-foreground">User reported improvement</div>
-          </Card>
+        {/* Call to Action */}
+        <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1400`}>
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
+            <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
+              Stop Wasting Time on Amateur Tools
+            </h3>
+            <p className="text-slate-600 dark:text-slate-300 mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed">
+              Upgrade to professional AI development tools and see immediate improvements in quality, efficiency, and results.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 text-white dark:text-slate-900 px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold rounded-lg shadow-sm transition-all duration-300">
+                Start Professional Development
+                <Check size={20} className="ml-2" />
+              </Button>
+              <Button variant="outline" size="lg" className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold rounded-lg border-2 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300">
+                See the Difference
+              </Button>
         </div>
-
-        {/* Call to Action for This Section */}
-        <div className={`text-center transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <p className="text-lg text-muted-foreground mb-6">
-            Ready to upgrade from shallow prompting to strategic AI communication?
-          </p>
-          <div className="inline-flex items-center px-6 py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg hover:bg-primary/20 transition-colors duration-300">
-            <span className="text-sm font-medium">Try the analyzer below and see the difference</span>
-            <ArrowRight className="w-4 h-4 ml-2" />
           </div>
         </div>
       </div>

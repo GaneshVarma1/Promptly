@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Star, Download, Trash2 } from 'lucide-react';
+import { FileText, Star, Download, Trash2, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { Document } from '@/hooks/use-documents';
 
@@ -9,9 +9,17 @@ interface DocumentCardProps {
   onDelete: (id: string) => void;
   onOpen: (id: string) => void;
   onToggleSave: (id: string) => void;
+  isTrashMode?: boolean;
 }
 
-export const DocumentCard: React.FC<DocumentCardProps> = ({ document, isSaved, onDelete, onOpen, onToggleSave }) => {
+export const DocumentCard: React.FC<DocumentCardProps> = ({ 
+  document, 
+  isSaved, 
+  onDelete, 
+  onOpen, 
+  onToggleSave, 
+  isTrashMode = false 
+}) => {
   const handleDownload = (doc: Document) => {
     const blob = new Blob([doc.content], { type: 'text/plain;charset=utf-8' });
     const link = window.document.createElement('a');
@@ -41,10 +49,16 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, isSaved, o
               )}
             </div>
           </div>
-          {isSaved && (
-            <div className="w-8 h-8 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-              <Star className="w-4 h-4 text-blue-600 dark:text-blue-400 fill-current" />
+          {isTrashMode ? (
+            <div className="w-8 h-8 bg-orange-50 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
+              <Trash2 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
             </div>
+          ) : (
+            isSaved && (
+              <div className="w-8 h-8 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                <Star className="w-4 h-4 text-blue-600 dark:text-blue-400 fill-current" />
+              </div>
+            )
           )}
         </div>
         <div className="mb-4">
@@ -59,27 +73,38 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, isSaved, o
       <div className="px-4 md:px-6 py-3 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50 mt-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <button 
-              onClick={() => onToggleSave(document.id)}
-              aria-label={isSaved ? 'Unsave document' : 'Save document'}
-              className={`p-2 rounded-lg transition-colors ${isSaved ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400'} hover:bg-gray-100 dark:hover:bg-zinc-800`}
-              title={isSaved ? 'Remove from favorites' : 'Save to favorites'}
-            >
-              <Star className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-            </button>
+            {isTrashMode ? (
+              <button 
+                onClick={() => onToggleSave(document.id)}
+                aria-label="Restore prompt"
+                className="p-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                title="Restore to prompts"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            ) : (
+              <button 
+                onClick={() => onToggleSave(document.id)}
+                aria-label={isSaved ? 'Unsave prompt' : 'Save prompt'}
+                className={`p-2 rounded-lg transition-colors ${isSaved ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400'} hover:bg-gray-100 dark:hover:bg-zinc-800`}
+                title={isSaved ? 'Remove from collection' : 'Add to collection'}
+              >
+                <Star className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+              </button>
+            )}
             <button 
               onClick={() => handleDownload(document)}
               className="p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
-              title="Download"
-              aria-label="Download document"
+              title="Download prompt"
+              aria-label="Download prompt"
             >
               <Download className="w-4 h-4" />
             </button>
             <button 
               onClick={() => onDelete(document.id)}
               className="p-2 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors" 
-              title="Move to trash"
-              aria-label="Move document to trash"
+              title={isTrashMode ? "Delete permanently" : "Move to trash"}
+              aria-label={isTrashMode ? "Delete prompt permanently" : "Move prompt to trash"}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -87,7 +112,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, isSaved, o
           <button
             onClick={() => onOpen(document.id)}
             className="inline-flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-900 dark:text-white text-sm font-medium rounded-lg transition-colors shadow-sm border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600"
-            aria-label="Open document"
+            aria-label="Open prompt"
           >
             Open
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

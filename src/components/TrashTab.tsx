@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { SearchIcon, TrashIcon, AlertTriangleIcon } from 'lucide-react';
+import { SearchIcon, TrashIcon, AlertTriangleIcon, RotateCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -35,12 +35,20 @@ export function TrashTab() {
     setStatus(id, 'active');
   };
 
+  const handleRestoreAll = () => {
+    if (confirm('Are you sure you want to restore all prompts from trash? They will be moved back to your active prompts.')) {
+      trashedDocuments.forEach(doc => {
+        setStatus(doc.id, 'active');
+      });
+    }
+  };
+
   const handleOpen = (id: string) => {
     router.push(`/results?id=${id}`);
   };
 
   const handlePermanentDelete = () => {
-    if (confirm('Are you sure you want to permanently delete all documents in trash? This action cannot be undone.')) {
+    if (confirm('Are you sure you want to permanently delete all prompts in trash? This action cannot be undone.')) {
       // Delete all trashed documents permanently
       trashedDocuments.forEach(doc => {
         localStorage.removeItem(`document-${doc.id}`);
@@ -64,18 +72,28 @@ export function TrashTab() {
             Trash
           </h2>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Deleted documents (can be restored)
+            Deleted prompts (can be restored)
           </p>
         </div>
         {trashedDocuments.length > 0 && (
-          <Button 
-            onClick={handlePermanentDelete}
-            variant="destructive"
-            className="bg-red-600 hover:bg-red-700 text-white"
-          >
-            <TrashIcon className="w-4 h-4 mr-2" />
-            Empty Trash
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button 
+              onClick={handleRestoreAll}
+              variant="outline"
+              className="bg-white dark:bg-zinc-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-600"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Restore All
+            </Button>
+            <Button 
+              onClick={handlePermanentDelete}
+              variant="destructive"
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <TrashIcon className="w-4 h-4 mr-2" />
+              Empty Trash
+            </Button>
+          </div>
         )}
       </div>
 
@@ -84,7 +102,7 @@ export function TrashTab() {
         <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <Input
           type="text"
-          placeholder="Search deleted documents..."
+          placeholder="Search deleted prompts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10 bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700"
@@ -98,27 +116,27 @@ export function TrashTab() {
             <TrashIcon className="w-8 h-8 text-gray-400 dark:text-zinc-500" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            {searchQuery ? 'No deleted documents found' : 'Trash is empty'}
+            {searchQuery ? 'No deleted prompts found' : 'Trash is empty'}
           </h3>
           <p className="text-gray-500 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
             {searchQuery 
               ? 'Try adjusting your search terms to find what you\'re looking for.'
-              : 'Documents you delete will appear here and can be restored.'
+              : 'Prompts you delete will appear here and can be restored.'
             }
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Warning banner */}
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          {/* Info banner */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <AlertTriangleIcon className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              <RotateCcw className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <div>
-                <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                  Documents in trash
+                <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  Prompts in trash
                 </p>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                  These documents are deleted but can still be restored. Use "Empty Trash" to permanently delete them.
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  These prompts can be restored to your active library or permanently deleted. Click the restore icon on any prompt to move it back.
                 </p>
               </div>
             </div>
@@ -130,6 +148,7 @@ export function TrashTab() {
             onDelete={deleteDocument}
             onOpen={handleOpen}
             onToggleSave={handleRestore}
+            isTrashMode={true}
           />
         </div>
       )}
