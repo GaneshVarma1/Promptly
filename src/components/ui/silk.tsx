@@ -1,5 +1,8 @@
 /* eslint-disable react/no-unknown-property */
-import React, { forwardRef, useMemo, useRef, useLayoutEffect } from "react";
+"use client";
+
+import React, { forwardRef, useMemo, useRef, useLayoutEffect, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
 import { Color, Mesh, ShaderMaterial } from "three";
 import { IUniform } from "three";
@@ -155,10 +158,16 @@ const Silk: React.FC<SilkProps> = ({
   );
 
   return (
-    <Canvas dpr={[1, 2]} frameloop="always">
-      <SilkPlane ref={meshRef} uniforms={uniforms} />
-    </Canvas>
+    <Suspense fallback={<div className="w-full h-full bg-white dark:bg-slate-950" />}>
+      <Canvas dpr={[1, 2]} frameloop="always">
+        <SilkPlane ref={meshRef} uniforms={uniforms} />
+      </Canvas>
+    </Suspense>
   );
 };
 
-export default Silk;
+// Export with dynamic import to prevent SSR issues
+export default dynamic(() => Promise.resolve(Silk), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-white dark:bg-slate-950" />
+});

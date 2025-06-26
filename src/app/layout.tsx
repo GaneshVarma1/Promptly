@@ -19,26 +19,11 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-// Try to load League Spartan with fallback
-let leagueSpartan: any = null;
-try {
-  // Dynamic import to avoid build failures
-  const { League_Spartan } = require("next/font/google");
-  leagueSpartan = League_Spartan({
-    variable: "--font-league-spartan",
-    subsets: ["latin"],
-    weight: ["400", "500", "600", "700", "800", "900"],
-    display: 'swap',
-    fallback: ['system-ui', 'Arial', 'sans-serif'],
-  });
-} catch (error) {
-  console.warn('League Spartan font failed to load, using fallback:', error);
-  // Create a fallback font object
-  leagueSpartan = {
-    variable: "--font-league-spartan",
-    style: { fontFamily: 'system-ui, Arial, sans-serif' }
-  };
-}
+// Simplified font handling to prevent SSR issues
+const leagueSpartan = {
+  variable: "--font-league-spartan",
+  style: { fontFamily: 'var(--font-league-spartan)' }
+};
 
 export const metadata: Metadata = {
   title: "Refine AI Write - Prompt Analysis Tool",
@@ -67,6 +52,18 @@ function ErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+// Loading component
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-slate-300 dark:border-slate-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -76,6 +73,7 @@ export default function RootLayout({
     <ClerkProvider
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
       <html
         lang="en"
@@ -83,6 +81,21 @@ export default function RootLayout({
         style={{ backgroundColor: "#020617", colorScheme: "dark" }}
       >
         <head>
+          <Script
+            id="clerk-debug"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                // Debug Clerk configuration
+                console.log('🔧 Clerk Debug Info:', {
+                  publishableKey: '${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? 'Set' : 'Missing'}',
+                  domain: window.location.hostname,
+                  protocol: window.location.protocol,
+                  url: window.location.href
+                });
+              `,
+            }}
+          />
           <Script
             id="theme-script"
             strategy="beforeInteractive"
@@ -186,16 +199,14 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${inter.variable} ${jetbrainsMono.variable} ${leagueSpartan?.variable || ''} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
+          className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
           style={{ 
             backgroundColor: "#020617",
             fontFamily: 'var(--font-league-spartan)'
           }}
         >
           <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-slate-300 dark:border-slate-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+            <LoadingFallback />
           }>
             {children}
           </Suspense>
