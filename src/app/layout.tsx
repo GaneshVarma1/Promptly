@@ -63,7 +63,11 @@ export default function RootLayout({
       afterSignInUrl="/dashboard"
       afterSignUpUrl="/dashboard"
     >
-      <html lang="en" suppressHydrationWarning>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        style={{ backgroundColor: "#020617", colorScheme: "dark" }}
+      >
         <head>
           <Script
             id="theme-script"
@@ -169,6 +173,7 @@ export default function RootLayout({
         </head>
         <body
           className={`${inter.variable} ${jetbrainsMono.variable} ${leagueSpartan.variable} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
+          style={{ backgroundColor: "#020617" }}
         >
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">

@@ -364,7 +364,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
             whileHover="hover"
             whileTap="tap"
             variants={cardVariants}
-            className="group relative overflow-hidden border border-white/20 dark:border-white/10 hover:border-white/30 dark:hover:border-white/20 transition-all duration-300 hover:shadow-2xl rounded-2xl cursor-pointer backdrop-blur-xl bg-white/10 dark:bg-black/10"
+            className="group relative overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-300 hover:shadow-2xl rounded-2xl cursor-pointer backdrop-blur-xl bg-white/10 dark:bg-black/10"
           >
             {/* Animated background gradient */}
             <motion.div
@@ -380,7 +380,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
               }}
             />
             
-            <div className="relative z-10 p-6 bg-transparent">
+            <div className="relative z-10 p-6 bg-transparent border border-slate-200 dark:border-slate-800 rounded-2xl">
               <div className="flex items-center gap-4 mb-4">
                 <motion.div 
                   className="w-12 h-12 bg-gradient-to-r from-gray-900 to-black dark:from-white dark:to-gray-100 rounded-xl flex items-center justify-center shadow-lg backdrop-blur-sm"
@@ -409,7 +409,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                 <Button 
                   onClick={onNewPrompt} 
-                  className="w-full bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-black font-medium py-3 backdrop-blur-sm border border-white/20 dark:border-black/20"
+                  className="w-full bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-black font-medium py-3 backdrop-blur-sm border border-slate-200 dark:border-slate-800"
                 >
                   Create Prompt
                   <motion.div
@@ -430,12 +430,12 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
             whileHover="hover"
             whileTap="tap"
             variants={cardVariants}
-            className="group cursor-pointer backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 dark:border-white/10 hover:border-white/30 dark:hover:border-white/20 rounded-2xl hover:shadow-2xl transition-all duration-300"
+            className="group cursor-pointer backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-2xl hover:shadow-2xl transition-all duration-300"
           >
             <div className="p-6">
               <div className="flex items-center gap-4 mb-4">
                 <motion.div 
-                  className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors backdrop-blur-sm border border-white/20 dark:border-white/10"
+                  className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors backdrop-blur-sm border border-slate-200 dark:border-slate-800"
                   variants={iconVariants}
                   whileHover="hover"
                 >
@@ -462,7 +462,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
                 <Button 
                   onClick={handleTemplateStart} 
                   variant="outline" 
-                  className="w-full border-white/30 dark:border-white/20 hover:border-white/50 dark:hover:border-white/30 hover:bg-white/10 dark:hover:bg-black/20 py-3 backdrop-blur-sm text-gray-900 dark:text-white"
+                  className="w-full border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-white/10 dark:hover:bg-black/20 py-3 backdrop-blur-sm text-gray-900 dark:text-white"
                 >
                   Browse Gallery
                   <ArrowRightIcon className="w-4 h-4 ml-2" />
@@ -478,12 +478,12 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
             whileHover="hover"
             whileTap="tap"
             variants={cardVariants}
-            className="group cursor-pointer backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 dark:border-white/10 hover:border-white/30 dark:hover:border-white/20 rounded-2xl hover:shadow-2xl transition-all duration-300"
+            className="group cursor-pointer backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-2xl hover:shadow-2xl transition-all duration-300"
           >
             <div className="p-6">
               <div className="flex items-center gap-4 mb-4">
                 <motion.div 
-                  className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors backdrop-blur-sm border border-white/20 dark:border-white/10"
+                  className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors backdrop-blur-sm border border-slate-200 dark:border-slate-800"
                   variants={iconVariants}
                   whileHover="hover"
                 >
@@ -510,7 +510,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
                 <Button 
                   onClick={handleImportPrompt} 
                   variant="outline" 
-                  className="w-full border-white/30 dark:border-white/20 hover:border-white/50 dark:hover:border-white/30 hover:bg-white/10 dark:hover:bg-black/20 py-3 backdrop-blur-sm text-gray-900 dark:text-white"
+                  className="w-full border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-white/10 dark:hover:bg-black/20 py-3 backdrop-blur-sm text-gray-900 dark:text-white"
                 >
                   Upload File
                   <FileUpIcon className="w-4 h-4 ml-2" />
@@ -530,7 +530,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
             animate="visible"
             exit="hidden"
           >
-            <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl">
+            <div className="backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl">
               <div className="p-6">
                 <motion.div 
                   className="flex items-center gap-3 mb-4"
@@ -558,7 +558,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
                     <motion.button
                       key={doc.id}
                       onClick={() => handleRecentWork(doc.id)}
-                      className="text-left p-4 rounded-lg border border-white/20 dark:border-white/10 hover:border-white/30 dark:hover:border-white/20 hover:bg-white/10 dark:hover:bg-black/20 transition-colors group backdrop-blur-sm"
+                      className="text-left p-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-white/10 dark:hover:bg-black/20 transition-colors group backdrop-blur-sm"
                       variants={recentWorkVariants}
                       initial="hidden"
                       animate="visible"
@@ -607,7 +607,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
                 animate="visible"
                 exit="exit"
               >
-                <div className="w-full max-w-md backdrop-blur-xl bg-white/90 dark:bg-black/90 border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl">
+                <div className="w-full max-w-md backdrop-blur-xl bg-white/90 dark:bg-black/90 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl">
                   <div className="p-6">
                     <motion.h3 
                       className="text-lg font-semibold text-gray-900 dark:text-white mb-4"
@@ -629,7 +629,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
                       type="file"
                       accept=".txt,.md,.json"
                       onChange={handleFileUpload}
-                      className="w-full p-3 border border-white/20 dark:border-white/10 rounded-lg bg-white/50 dark:bg-black/50 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 backdrop-blur-sm"
+                      className="w-full p-3 border border-slate-200 dark:border-slate-800 rounded-lg bg-white/50 dark:bg-black/50 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 backdrop-blur-sm"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
@@ -646,7 +646,7 @@ export function GetStartedSection({ onNewPrompt, onTabChange }: GetStartedSectio
                         whileTap="tap"
                         className="flex-1"
                       >
-                        <Button variant="outline" onClick={() => setShowUploadDialog(false)} className="w-full backdrop-blur-sm border-white/30 dark:border-white/20 text-gray-900 dark:text-white hover:bg-white/10 dark:hover:bg-black/20">
+                        <Button variant="outline" onClick={() => setShowUploadDialog(false)} className="w-full backdrop-blur-sm border-slate-200 dark:border-slate-800 text-gray-900 dark:text-white hover:bg-white/10 dark:hover:bg-black/20">
                           Cancel
                         </Button>
                       </motion.div>
