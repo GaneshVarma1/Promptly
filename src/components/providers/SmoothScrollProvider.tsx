@@ -23,7 +23,6 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
         while (current && current !== document.body) {
           const style = window.getComputedStyle(current);
           if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
-            console.log('Lenis prevented on element:', current);
             return true; // Prevent Lenis from controlling this element
           }
           current = current.parentElement;
@@ -34,8 +33,6 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
 
     // Make Lenis globally accessible
     (window as any).lenis = lenisRef.current;
-
-    console.log('Lenis initialized successfully');
 
     // RAF loop
     function raf(time: number) {
@@ -56,7 +53,6 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
         lenisRef.current.destroy();
         lenisRef.current = null;
         delete (window as any).lenis;
-        console.log('Lenis destroyed');
       }
     };
   }, []);
