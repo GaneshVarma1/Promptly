@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { 
   Search, 
   Copy, 
+  Star, 
   FileText, 
   Mail, 
   Code, 
@@ -19,6 +20,7 @@ import {
   X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { PROMPT_GALLERY_TEMPLATES } from "@/constants";
 
 interface Template {
   id: string;
