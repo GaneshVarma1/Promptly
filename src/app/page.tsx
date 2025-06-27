@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import LandingPage from "@/components/LandingPage";
 import Header from "@/components/Header";
+import { SmoothScrollTest } from "@/components/ui/smooth-scroll-test";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -54,6 +55,7 @@ export default function Home() {
           onPromptSubmit={handlePromptSubmit}
         />
       </main>
+      <SmoothScrollTest />
     </div>
   );
 }
