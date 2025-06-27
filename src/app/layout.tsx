@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Script from "next/script";
 import { Suspense } from "react";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
 // Try to load fonts with fallbacks
 let inter: any = null;
@@ -224,7 +225,9 @@ export default function RootLayout({
           <Suspense fallback={
             <LoadingFallback />
           }>
-            {children}
+            <SmoothScrollProvider>
+              {children}
+            </SmoothScrollProvider>
           </Suspense>
         </body>
       </html>

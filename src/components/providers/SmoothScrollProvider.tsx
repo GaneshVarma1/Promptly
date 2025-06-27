@@ -1,0 +1,48 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import Lenis from 'lenis';
+
+interface SmoothScrollProviderProps {
+  children: React.ReactNode;
+}
+
+export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ children }) => {
+  const lenisRef = useRef<Lenis | null>(null);
+
+  useEffect(() => {
+    // Initialize Lenis with basic configuration
+    lenisRef.current = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      autoRaf: true,
+    });
+
+    // Make Lenis globally accessible
+    (window as any).lenis = lenisRef.current;
+
+    // RAF loop
+    function raf(time: number) {
+      lenisRef.current?.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Optional: Log scroll events for debugging
+    lenisRef.current.on('scroll', (e: any) => {
+      // You can add custom scroll handling here if needed
+      // console.log('Scroll event:', e);
+    });
+
+    // Cleanup function
+    return () => {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+        delete (window as any).lenis;
+      }
+    };
+  }, []);
+
+  return <>{children}</>;
+}; 

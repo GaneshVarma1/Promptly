@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Lenis smooth scroll styles */
+@import 'lenis/dist/lenis.css';
+
 /* Font fallbacks for when Google Fonts fails */
 @layer base {
   :root {
