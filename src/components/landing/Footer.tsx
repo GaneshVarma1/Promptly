@@ -19,7 +19,7 @@ export const Footer: FC = () => {
       </div>
       <div className="flex items-center gap-4">
         <a
-          href="https://www.linkedin.com/in/YOUR_LINKEDIN_USERNAME"
+          href="https://www.linkedin.com/in/sriganeshshiramshetty"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
@@ -28,7 +28,7 @@ export const Footer: FC = () => {
           <Linkedin className="w-5 h-5" />
         </a>
         <a
-          href="https://github.com/YOUR_GITHUB_USERNAME"
+          href="https://github.com/GaneshVarma1"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-slate-900 dark:hover:text-white transition-colors"
