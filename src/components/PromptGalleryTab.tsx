@@ -16,7 +16,8 @@ import {
   Users,
   BookOpen,
   Zap,
-  ArrowRight
+  ArrowRight,
+  X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { PROMPT_GALLERY_TEMPLATES } from "@/constants";
@@ -144,6 +145,14 @@ export default function PromptGalleryTab() {
     }
   };
 
+  const clearFilters = () => {
+    setSelectedCategory('All');
+    setSelectedDifficulty('All');
+    setSearchQuery('');
+  };
+
+  const hasActiveFilters = selectedCategory !== 'All' || selectedDifficulty !== 'All' || searchQuery !== '';
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -157,46 +166,83 @@ export default function PromptGalleryTab() {
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-4">
-          <div className="relative flex-1 min-w-[300px]">
+        {/* Search and Filters Row */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search Bar - 75% Width */}
+          <div className="relative lg:w-3/4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               type="text"
               placeholder="Search templates..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10 w-full"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
-          
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
 
-          <select
-            value={selectedDifficulty}
-            onChange={(e) => setSelectedDifficulty(e.target.value)}
-            className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
-          >
-            {difficulties.map(difficulty => (
-              <option key={difficulty} value={difficulty}>{difficulty}</option>
-            ))}
-          </select>
+          {/* Filters - 25% Width */}
+          <div className="lg:w-1/4">
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              <div className="flex flex-col sm:flex-row gap-2 w-full">
+                {/* Category Filter */}
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex-1 min-w-0"
+                >
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+
+                {/* Difficulty Filter */}
+                <select
+                  value={selectedDifficulty}
+                  onChange={(e) => setSelectedDifficulty(e.target.value)}
+                  className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex-1 min-w-0"
+                >
+                  {difficulties.map(difficulty => (
+                    <option key={difficulty} value={difficulty}>{difficulty}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Clear Filters and Results Count */}
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {hasActiveFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 text-xs"
+                  >
+                    Clear
+                  </Button>
+                )}
+                
+                {/* Results Count */}
+                <div className="text-xs text-gray-500 dark:text-gray-400 ml-auto sm:ml-0">
+                  {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Templates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         {filteredTemplates.map((template) => (
-          <Card key={template.id} className="group hover:shadow-md transition-all duration-200 border border-gray-200 dark:border-gray-700">
-            <div className="p-6">
+          <Card key={template.id} className="group hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600">
+            <div className="p-4 md:p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400">
@@ -232,7 +278,7 @@ export default function PromptGalleryTab() {
               </div>
             </div>
 
-            <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+            <div className="px-4 md:px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
               <div className="flex items-center justify-between">
                 <button 
                   onClick={() => handleCopyTemplate(template.content)}
@@ -261,9 +307,14 @@ export default function PromptGalleryTab() {
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             No templates found
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
             Try adjusting your search or filter criteria
           </p>
+          {hasActiveFilters && (
+            <Button onClick={clearFilters} variant="outline">
+              Clear all filters
+            </Button>
+          )}
         </div>
       )}
     </div>
