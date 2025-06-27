@@ -95,7 +95,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="flex-1 h-screen overflow-hidden pt-16 md:pt-0 md:ml-0">
         <div className="h-full flex flex-col p-3 sm:p-4 md:p-6 lg:p-8">
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" data-lenis-prevent>
             {renderTabContent()}
           </div>
         </div>

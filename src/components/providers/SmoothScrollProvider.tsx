@@ -16,10 +16,26 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       autoRaf: true,
+      // Prevent Lenis from interfering with nested scrolling containers
+      prevent: (node) => {
+        // Check if the element or any of its parents has overflow-y-auto
+        let current = node;
+        while (current && current !== document.body) {
+          const style = window.getComputedStyle(current);
+          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+            console.log('Lenis prevented on element:', current);
+            return true; // Prevent Lenis from controlling this element
+          }
+          current = current.parentElement;
+        }
+        return false;
+      },
     });
 
     // Make Lenis globally accessible
     (window as any).lenis = lenisRef.current;
+
+    console.log('Lenis initialized successfully');
 
     // RAF loop
     function raf(time: number) {
@@ -40,6 +56,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
         lenisRef.current.destroy();
         lenisRef.current = null;
         delete (window as any).lenis;
+        console.log('Lenis destroyed');
       }
     };
   }, []);
