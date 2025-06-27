@@ -25,10 +25,10 @@ export const HowItWorksSection: FC<HowItWorksSectionProps> = ({ isVisible }) => 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16 md:mb-20">
           {/* Step 1: Create & Organize */}
           <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-200`}>
-            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
+            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
               {/* Step Number */}
               <div className="absolute -top-3 -left-3 w-8 h-8 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">1</div>
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                 <Plus size={32} className="text-slate-700 dark:text-slate-300" />
               </div>
               <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -56,10 +56,10 @@ export const HowItWorksSection: FC<HowItWorksSectionProps> = ({ isVisible }) => 
 
           {/* Step 2: Test & Optimize */}
           <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-400`}>
-            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
+            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
               {/* Step Number */}
               <div className="absolute -top-3 -left-3 w-8 h-8 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">2</div>
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                 <Settings size={32} className="text-slate-700 dark:text-slate-300" />
               </div>
               <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -87,10 +87,10 @@ export const HowItWorksSection: FC<HowItWorksSectionProps> = ({ isVisible }) => 
 
           {/* Step 3: Deploy & Scale */}
           <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-600`}>
-            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
+            <div className="relative p-6 md:p-8 h-full backdrop-blur-xl bg-white/30 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/40 dark:hover:bg-black/80">
               {/* Step Number */}
               <div className="absolute -top-3 -left-3 w-8 h-8 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">3</div>
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                 <Archive size={32} className="text-slate-700 dark:text-slate-300" />
               </div>
               <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -119,7 +119,7 @@ export const HowItWorksSection: FC<HowItWorksSectionProps> = ({ isVisible }) => 
 
         {/* Benefits Section */}
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-800`}>
-          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
             <div className="text-center mb-8 md:mb-12">
               <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
                 The Promptly Advantage
@@ -130,25 +130,25 @@ export const HowItWorksSection: FC<HowItWorksSectionProps> = ({ isVisible }) => 
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <Activity size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">3x</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400">Better Results</div>
               </div>
               
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <Archive size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">5x</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400">Faster Iteration</div>
               </div>
               
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <Settings size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">90%</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400">Consistency</div>
               </div>
               
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <ArrowUp size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">50%</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400">Cost Reduction</div>
@@ -159,7 +159,7 @@ export const HowItWorksSection: FC<HowItWorksSectionProps> = ({ isVisible }) => 
 
         {/* Call to Action */}
         <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1000`}>
-          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
             <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
               Ready to Transform Your AI Workflow?
             </h3>
