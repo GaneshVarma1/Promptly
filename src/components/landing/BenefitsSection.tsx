@@ -29,8 +29,8 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-16 md:mb-20">
             {/* Benefit 1: Consistent Results */}
             <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-200`}>
-              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                   <Activity size={32} className="text-slate-700 dark:text-slate-300" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -58,8 +58,8 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
             {/* Benefit 2: Time Efficiency */}
             <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-400`}>
-              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                   <ArrowUp size={32} className="text-slate-700 dark:text-slate-300" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -87,8 +87,8 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
             {/* Benefit 3: Enterprise Security */}
             <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-600`}>
-              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                   <Lock size={32} className="text-slate-700 dark:text-slate-300" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -116,8 +116,8 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
             {/* Benefit 4: Team Collaboration */}
             <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-800`}>
-              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                   <Heart size={32} className="text-slate-700 dark:text-slate-300" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -145,8 +145,8 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
             {/* Benefit 5: Cost Optimization */}
             <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1000`}>
-              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                   <Star size={32} className="text-slate-700 dark:text-slate-300" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -174,8 +174,8 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
             {/* Benefit 6: Professional Growth */}
             <div className={`group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1200`}>
-              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-200 dark:border-white/20 hover:shadow-2xl hover:border-slate-300 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-200 dark:border-white/20">
+              <div className="p-6 md:p-8 h-full backdrop-blur-xl bg-white/25 dark:bg-black/70 border border-slate-300 dark:border-white/20 hover:shadow-2xl hover:border-slate-400 dark:hover:border-white/30 transition-all duration-300 rounded-2xl hover:bg-white/35 dark:hover:bg-black/80">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-100/70 dark:bg-slate-800/70 rounded-lg flex items-center justify-center mb-6 md:mb-8 group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-colors duration-300 backdrop-blur-sm border border-slate-300 dark:border-white/20">
                   <Eye size={32} className="text-slate-700 dark:text-slate-300" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
@@ -204,7 +204,7 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
           {/* Technical Excellence Comparison */}
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1400`}>
-            <div className="backdrop-blur-xl bg-white/25 dark:bg-black/25 border border-white/35 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+            <div className="backdrop-blur-xl bg-white/25 dark:bg-black/25 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
               <div className="text-center mb-8 md:mb-12">
                 <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
                   Technical Excellence Comparison
@@ -216,7 +216,7 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                 {/* Consumer Approach */}
-                <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8">
+                <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl p-6 md:p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                     <h4 className="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-200">Consumer Approach</h4>
@@ -246,7 +246,7 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
                 </div>
                 
                 {/* Professional Approach */}
-                <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8">
+                <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl p-6 md:p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-3 h-3 bg-emerald-600 rounded-full"></div>
                     <h4 className="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-200">Professional Approach</h4>
@@ -280,7 +280,7 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
           {/* ROI Section */}
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1600`}>
-            <div className="backdrop-blur-xl bg-white/25 dark:bg-black/25 border border-white/35 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+            <div className="backdrop-blur-xl bg-white/25 dark:bg-black/25 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
               <div className="text-center mb-8 md:mb-12">
                 <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
                   Return on Investment
@@ -291,25 +291,25 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                   <ArrowUp size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                   <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">75%</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Development Time Reduction</div>
                 </div>
                 
-                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                   <Activity size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                   <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">4x</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Output Quality Improvement</div>
                 </div>
                 
-                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                   <Star size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                   <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">60%</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">AI Cost Reduction</div>
                 </div>
                 
-                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+                <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                   <Heart size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-3 md:mb-4" />
                   <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">95%</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Team Satisfaction</div>
@@ -320,7 +320,7 @@ export const BenefitsSection: FC<BenefitsSectionProps> = ({ isVisible }) => {
 
           {/* Call to Action */}
           <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1800`}>
-            <div className="backdrop-blur-xl bg-white/25 dark:bg-black/25 border border-white/35 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
+            <div className="backdrop-blur-xl bg-white/25 dark:bg-black/25 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
               <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
                 Start Your Professional AI Journey
               </h3>

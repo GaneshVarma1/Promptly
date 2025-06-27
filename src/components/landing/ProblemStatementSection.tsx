@@ -173,7 +173,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
 
         {/* Enterprise Solution Section */}
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-800`}>
-          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
             <div className="text-center mb-8 md:mb-12">
               <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
                 The Enterprise Solution
@@ -185,7 +185,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
               {/* Solution 1 */}
-              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
                 <Check size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-4 md:mb-6" />
                 <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 md:mb-4">
                   Organized Libraries
@@ -196,7 +196,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
                   </div>
               
               {/* Solution 2 */}
-              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
                 <Check size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-4 md:mb-6" />
                 <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 md:mb-4">
                   Multi-Model Testing
@@ -207,7 +207,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
               </div>
 
               {/* Solution 3 */}
-              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl p-6 md:p-8 text-center">
                 <Check size={40} className="text-emerald-600 dark:text-emerald-400 mx-auto mb-4 md:mb-6" />
                 <h4 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3 md:mb-4">
                   Advanced Analytics
@@ -222,7 +222,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
 
         {/* Statistics Showcase */}
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1000`}>
-          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
             <div className="text-center mb-8 md:mb-12">
               <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
                 The Cost of Inefficiency
@@ -233,7 +233,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <AlertTriangle size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
                   <CountUp end={70} isVisible={isVisible} />
@@ -241,7 +241,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
                 <div className="text-sm text-slate-600 dark:text-slate-400">Time Wasted on Recreation</div>
                 </div>
               
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <Heart size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
                   <CountUp end={40} isVisible={isVisible} />
@@ -249,7 +249,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
                 <div className="text-sm text-slate-600 dark:text-slate-400">Higher AI Costs</div>
               </div>
 
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <AlertTriangle size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
                   <CountUp end={60} isVisible={isVisible} />
@@ -257,7 +257,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
                 <div className="text-sm text-slate-600 dark:text-slate-400">Inconsistent Quality</div>
               </div>
 
-              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl">
+              <div className="text-center p-4 md:p-6 backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl">
                 <Heart size={40} className="text-orange-600 dark:text-orange-400 mx-auto mb-3 md:mb-4" />
                 <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 md:mb-2">
                   <CountUp end={0} isVisible={isVisible} />
@@ -270,7 +270,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
 
         {/* Solution Benefits */}
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1200`}>
-          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 mb-12 md:mb-16 shadow-2xl">
             <div className="text-center mb-8 md:mb-12">
               <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 tracking-tight">
                 Transform Your AI Workflow
@@ -282,7 +282,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
               {/* Before */}
-              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8">
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
                   <h4 className="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-200">Before: Amateur Approach</h4>
@@ -312,7 +312,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
               </div>
 
               {/* After */}
-              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/15 rounded-xl p-6 md:p-8">
+              <div className="backdrop-blur-xl bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/15 rounded-xl p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-3 h-3 bg-emerald-600 rounded-full animate-pulse"></div>
                   <h4 className="text-lg md:text-xl font-semibold text-slate-800 dark:text-slate-200">After: Professional Method</h4>
@@ -346,7 +346,7 @@ export const ProblemStatementSection: FC<ProblemStatementSectionProps> = ({ isVi
 
         {/* Call to Action */}
         <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} delay-1400`}>
-          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
+          <div className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-slate-300 dark:border-white/20 rounded-2xl p-6 md:p-8 shadow-2xl">
             <h3 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-slate-50 mb-4 md:mb-6 tracking-tight">
               Stop Wasting Time on Amateur Tools
             </h3>
