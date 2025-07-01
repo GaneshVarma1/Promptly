@@ -125,12 +125,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: '/favicon.png', type: 'image/png', sizes: '16x16' },
       { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
-      { url: '/favicon.ico', type: 'image/x-icon' },
-      { url: '/favicon.svg', type: 'image/svg+xml' }
+      { url: '/favicon.png', type: 'image/png', sizes: '48x48' },
+      { url: '/favicon.png', type: 'image/png', sizes: '64x64' },
+      { url: '/favicon.png', type: 'image/png', sizes: '128x128' },
+      { url: '/favicon.png', type: 'image/png', sizes: '256x256' },
+      { url: '/favicon.png', type: 'image/png', sizes: '512x512' }
     ],
     shortcut: '/favicon.png',
-    apple: '/favicon.png',
+    apple: '/favicon.png'
   },
   manifest: '/site.webmanifest',
 };
