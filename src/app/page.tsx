@@ -1,59 +1,51 @@
-"use client";
+import { Metadata } from "next";
+import HomePageClient from "@/components/HomePageClient";
 
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import LandingPage from "@/components/LandingPage";
-import Header from "@/components/Header";
-import { useEffect } from "react";
+// SEO metadata for the homepage
+export const metadata: Metadata = {
+  title: "Promptly - Professional AI Prompt Engineering Platform | Enterprise Prompt Development",
+  description: "Promptly is the leading enterprise AI prompt engineering platform. Build, test, and optimize professional AI prompts with systematic development tools, analytics, and collaboration features. Transform your AI workflows with Promptly.",
+  keywords: [
+    "Promptly",
+    "AI prompt engineering",
+    "prompt development",
+    "enterprise AI",
+    "AI workflow management",
+    "prompt optimization",
+    "AI development platform",
+    "professional prompts",
+    "AI engineering tools",
+    "prompt testing",
+    "AI collaboration",
+    "prompt analytics"
+  ],
+  openGraph: {
+    title: "Promptly - Professional AI Prompt Engineering Platform",
+    description: "Enterprise-grade AI prompt engineering platform for systematic prompt development, testing, and optimization. Transform your AI workflows with Promptly.",
+    url: "https://beta.promptly.diy",
+    siteName: "Promptly",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Promptly - Professional AI Prompt Engineering Platform",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Promptly - Professional AI Prompt Engineering Platform",
+    description: "Enterprise-grade AI prompt engineering platform for systematic prompt development, testing, and optimization.",
+    images: ["/og-image.png"],
+  },
+  alternates: {
+    canonical: "https://beta.promptly.diy",
+  },
+};
 
 export default function Home() {
-  const { isSignedIn, isLoaded } = useUser();
-  const router = useRouter();
-
-  // Redirect to dashboard if user is signed in
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      router.push('/dashboard');
-    }
-  }, [isLoaded, isSignedIn, router]);
-
-  const handlePromptSubmit = (prompt: string) => {
-    // For prompt submission, redirect to dashboard where they can create docs
-    // The header sign-in buttons will handle authentication via modals
-    if (isSignedIn) {
-      router.push('/dashboard');
-    } else {
-      // User will need to sign in via header buttons first
-      return;
-    }
-  };
-
-  const handleGetStarted = () => {
-    if (isSignedIn) {
-      router.push('/dashboard');
-    }
-    // User will need to sign in via header buttons first
-  };
-
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300 dark:border-gray-600"></div>
-      </div>
-    );
-  }
-
-  // If user is signed in, they'll be redirected to dashboard
-  // This page only shows for non-authenticated users
-  return (
-    <div className="min-h-screen bg-background" style={{ overscrollBehavior: 'none' }}>
-      <Header />
-      <main className="bg-background" style={{ overscrollBehavior: 'none' }}>
-        <LandingPage 
-          onGetStarted={handleGetStarted}
-          onPromptSubmit={handlePromptSubmit}
-        />
-      </main>
-    </div>
-  );
+  return <HomePageClient />;
 }

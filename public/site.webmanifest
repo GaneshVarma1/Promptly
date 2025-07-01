@@ -1,0 +1,28 @@
+{
+  "name": "Promptly - Professional AI Prompt Engineering Platform",
+  "short_name": "Promptly",
+  "description": "Enterprise-grade AI prompt engineering platform for systematic prompt development, testing, and optimization",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "developer-tools", "business"],
+  "lang": "en-US",
+  "scope": "/",
+  "prefer_related_applications": false
+} 

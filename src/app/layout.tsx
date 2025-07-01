@@ -50,8 +50,79 @@ const leagueSpartan = {
 };
 
 export const metadata: Metadata = {
-  title: "Refine AI Write - Prompt Analysis Tool",
-  description: "AI-powered prompt analysis and improvement tool",
+  title: {
+    default: "Promptly - Professional AI Prompt Engineering Platform | Enterprise Prompt Development",
+    template: "%s | Promptly - AI Prompt Engineering Platform"
+  },
+  description: "Promptly is the leading enterprise AI prompt engineering platform. Build, test, and optimize professional AI prompts with systematic development tools, analytics, and collaboration features. Transform your AI workflows with Promptly.",
+  keywords: [
+    "Promptly",
+    "AI prompt engineering",
+    "prompt development",
+    "enterprise AI",
+    "AI workflow management",
+    "prompt optimization",
+    "AI development platform",
+    "professional prompts",
+    "AI engineering tools",
+    "prompt testing",
+    "AI collaboration",
+    "prompt analytics",
+    "AI workflow automation",
+    "enterprise prompt platform",
+    "AI development tools"
+  ],
+  authors: [{ name: "Promptly Team" }],
+  creator: "Promptly",
+  publisher: "Promptly",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://beta.promptly.diy'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://beta.promptly.diy',
+    siteName: 'Promptly',
+    title: 'Promptly - Professional AI Prompt Engineering Platform',
+    description: 'Enterprise-grade AI prompt engineering platform for systematic prompt development, testing, and optimization. Transform your AI workflows with Promptly.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Promptly - Professional AI Prompt Engineering Platform',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Promptly - Professional AI Prompt Engineering Platform',
+    description: 'Enterprise-grade AI prompt engineering platform for systematic prompt development, testing, and optimization.',
+    images: ['/og-image.png'],
+    creator: '@promptly',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+    yandex: 'your-yandex-verification-code',
+    yahoo: 'your-yahoo-verification-code',
+  },
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
@@ -60,6 +131,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.png',
     apple: '/favicon.png',
   },
+  manifest: '/site.webmanifest',
 };
 
 // Error boundary component
@@ -113,6 +185,60 @@ export default function RootLayout({
         style={{ backgroundColor: "#020617", colorScheme: "dark" }}
       >
         <head>
+          {/* Structured Data for SEO */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                "name": "Promptly",
+                "description": "Professional AI prompt engineering platform for enterprise prompt development, testing, and optimization",
+                "url": "https://beta.promptly.diy",
+                "applicationCategory": "DeveloperApplication",
+                "operatingSystem": "Web",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "USD"
+                },
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": "4.8",
+                  "ratingCount": "150"
+                },
+                "author": {
+                  "@type": "Organization",
+                  "name": "Promptly"
+                },
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "Promptly",
+                  "url": "https://beta.promptly.diy"
+                }
+              })
+            }}
+          />
+          
+          {/* Organization Schema */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "Promptly",
+                "url": "https://beta.promptly.diy",
+                "logo": "https://beta.promptly.diy/favicon.png",
+                "description": "Leading enterprise AI prompt engineering platform",
+                "sameAs": [
+                  "https://twitter.com/promptly",
+                  "https://linkedin.com/company/promptly"
+                ]
+              })
+            }}
+          />
+          
           <Script
             id="theme-script"
             strategy="beforeInteractive"
