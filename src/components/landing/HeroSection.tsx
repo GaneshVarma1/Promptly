@@ -89,7 +89,7 @@ export const HeroSection: FC<HeroSectionProps> = ({ isVisible, onPromptSubmit })
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4 md:mb-6 leading-tight tracking-tight px-4">
             <span className="inline-block overflow-hidden">
               <span className="inline-block animate-slide-up-fade" style={{ animationDelay: '0.1s' }}>
-                Professional
+                Promptly
               </span>
             </span>{' '}
             <span className="inline-block overflow-hidden">
@@ -105,15 +105,15 @@ export const HeroSection: FC<HeroSectionProps> = ({ isVisible, onPromptSubmit })
             <br />
             <span className="text-slate-700 dark:text-slate-300 inline-block overflow-hidden">
               <span className="inline-block animate-slide-up-fade" style={{ animationDelay: '0.4s' }}>
-                Development
+                Engineering Platform
               </span>
             </span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-4xl mx-auto mb-6 md:mb-8 leading-relaxed font-medium px-4">
-            Unlike consumer chat interfaces, Promptly provides enterprise-grade tools for 
-            <span className="text-slate-900 dark:text-slate-100 font-semibold"> systematic prompt engineering</span> and AI workflow management.
+            The leading enterprise AI prompt engineering platform. Build, test, and optimize professional AI prompts with 
+            <span className="text-slate-900 dark:text-slate-100 font-semibold"> systematic development tools</span>, analytics, and collaboration features.
           </p>
         </div>
 
