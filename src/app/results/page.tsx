@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { analyzePromptClient, clearAnalysisCache, getCacheStats } from '@/lib/ai-client';
+import { analyzePromptClient, clearAnalysisCache, getCacheStats, supabase } from '@/lib/ai-client';
 import { AIAnalysisResult, ModelType } from '@/types';
 import { UserButton, useUser } from '@clerk/nextjs';
 import { ThemeSwitcher } from '@/components/ui/theme-switcher';
@@ -31,7 +31,7 @@ interface Suggestion {
 }
 
 export default function ResultsPage() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -47,6 +47,9 @@ export default function ResultsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Memoized model mapping for better performance
   const modelTypeMapping = useMemo(() => ({
@@ -82,7 +85,7 @@ export default function ResultsPage() {
       
       // Save the AI score to localStorage for the dashboard
       if (id && result.score?.overall) {
-        localStorage.setItem(`score-${id}`, result.score.overall.toString());
+        // localStorage.setItem(`score-${id}`, result.score.overall.toString());
         
         // Trigger dashboard update to show new score
         if (typeof window !== 'undefined') {
@@ -163,7 +166,6 @@ export default function ResultsPage() {
     regularSuggestions: suggestions.filter(s => !s.isPro)
   }), [suggestions]);
 
-  // Redirect to home page if user is not authenticated
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push('/');
@@ -171,55 +173,31 @@ export default function ResultsPage() {
   }, [isLoaded, isSignedIn, router]);
 
   useEffect(() => {
-    const loadDocument = () => {
-      if (id) {
-        console.log(`Trying to load document with ID: ${id}`);
-        const documentContent = localStorage.getItem(`document-${id}`);
-        console.log(`Document content found:`, documentContent);
-        
-        if (documentContent !== null) {
-          // Handle both new (empty) and existing documents
-          const isNewDocument = documentContent === '';
-          
-          // Check for custom title first, then fall back to content-based title
-          const customTitle = localStorage.getItem(`title-${id}`);
-          let title: string;
-          
-          if (customTitle) {
-            title = customTitle;
-          } else if (isNewDocument) {
-            title = 'New Document';
-          } else {
-            title = documentContent.trim() ? 
-              documentContent.substring(0, 50).trim() || 'Untitled Document' : 
-              'Untitled Document';
-          }
-          
-          const doc: Document = {
-            id: id,
-            title: title,
-            content: documentContent,
-            createdAt: new Date().toISOString()
-          };
-          console.log(`Document loaded successfully:`, doc);
-          setDocument(doc);
-          setContent(documentContent);
-          setIsLoading(false);
-        } else {
-          console.log(`Document not found for ID: ${id}, redirecting to dashboard`);
-          // Document not found, redirect to dashboard
-          window.location.href = '/dashboard';
-          return;
-        }
-      } else {
-        console.log('No ID provided');
+    const fetchDocument = async () => {
+      if (!id || !user?.id) return;
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { data, error } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('id', id)
+          .eq('user_id', user.id)
+          .single();
+        if (error) throw error;
+        setDocument(data);
+        setContent(data?.content || '');
+        setEditedTitle(data?.title || '');
+      } catch (err: any) {
+        setError(err.message || 'Failed to load document');
+      } finally {
         setIsLoading(false);
       }
     };
-
-    // For immediate loading without any delay
-    loadDocument();
-  }, [id]);
+    if (isLoaded && isSignedIn) {
+      fetchDocument();
+    }
+  }, [id, user?.id, isLoaded, isSignedIn]);
 
   // Trigger AI analysis when content or model changes (with longer debounce and minimum length)
   useEffect(() => {
@@ -232,23 +210,78 @@ export default function ResultsPage() {
     return () => clearTimeout(debounceTimer);
   }, [content, selectedModel, performAnalysis]);
 
+  // Consolidated save logic with proper error handling and optimistic updates
+  useEffect(() => {
+    if (!id || !user?.id) return;
+    
+    const saveDocument = async () => {
+      setIsSaving(true);
+      setSaveError(null);
+      
+      try {
+        const updateData = {
+          content,
+          title: editedTitle || document?.title || '',
+          score: analysis?.score?.overall ?? null,
+          model: selectedModel,
+          analysis: analysis ? JSON.stringify(analysis) : null,
+          lastModified: new Date().toISOString(),
+        };
+        
+        // Optimistic update
+        setDocument((prev) => prev ? { ...prev, ...updateData } : prev);
+        
+        const { error } = await supabase
+          .from('documents')
+          .update(updateData)
+          .eq('id', id)
+          .eq('user_id', user.id);
+          
+        if (error) {
+          console.error('Supabase update error:', error.message);
+          setSaveError(error.message);
+          // Revert optimistic update on error
+          setDocument((prev) => prev ? { ...prev, ...document } : prev);
+        }
+      } catch (err) {
+        console.error('Failed to save document:', err);
+        setSaveError(err instanceof Error ? err.message : 'Failed to save');
+        // Revert optimistic update on error
+        setDocument((prev) => prev ? { ...prev, ...document } : prev);
+      } finally {
+        setIsSaving(false);
+      }
+    };
+    
+    // Debounce to avoid excessive writes
+    const timeoutId = setTimeout(saveDocument, 800);
+    return () => clearTimeout(timeoutId);
+  }, [content, editedTitle, analysis, selectedModel, id, user?.id, document]);
+
+  // Update title in Supabase
+  const handleTitleSave = useCallback(() => {
+    if (document && id && editedTitle.trim()) {
+      const newTitle = editedTitle.trim();
+      const updatedDoc = { ...document, title: newTitle };
+      setDocument(updatedDoc);
+      setIsEditingTitle(false);
+      // Save to Supabase
+      supabase
+        .from('documents')
+        .update({ title: newTitle, lastModified: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id);
+    }
+  }, [document, id, editedTitle, user?.id]);
+
+  // Remove duplicate score save useEffect - now handled by consolidated save
+
   const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
     setContent(newContent);
-    
     if (document && id) {
       const updatedDoc = { ...document, content: newContent };
       setDocument(updatedDoc);
-      
-      // Debounced localStorage save for better performance
-      setTimeout(() => {
-        localStorage.setItem(`document-${id}`, newContent);
-        
-        // Dispatch update event so dashboard refreshes
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new Event('documents-updated'));
-        }
-      }, 100);
     }
   }, [document, id]);
 
@@ -257,12 +290,6 @@ export default function ResultsPage() {
     if (document && id) {
       const updatedDoc = { ...document, content: enhancedPrompt };
       setDocument(updatedDoc);
-      
-      localStorage.setItem(`document-${id}`, enhancedPrompt);
-      
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('documents-updated'));
-      }
     }
   }, [document, id]);
 
@@ -272,24 +299,6 @@ export default function ResultsPage() {
       setIsEditingTitle(true);
     }
   }, [document]);
-
-  const handleTitleSave = useCallback(() => {
-    if (document && id && editedTitle.trim()) {
-      const newTitle = editedTitle.trim();
-      const updatedDoc = { ...document, title: newTitle };
-      setDocument(updatedDoc);
-      
-      // Update title in localStorage by creating a custom title storage
-      localStorage.setItem(`title-${id}`, newTitle);
-      
-      // Trigger dashboard update
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('documents-updated'));
-      }
-      
-      setIsEditingTitle(false);
-    }
-  }, [document, id, editedTitle]);
 
   const handleTitleCancel = useCallback(() => {
     setIsEditingTitle(false);
@@ -304,31 +313,24 @@ export default function ResultsPage() {
     }
   }, [handleTitleSave, handleTitleCancel]);
 
-  // Show loading state immediately
-  if (isLoading) {
+  if (!isLoaded || isLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600 dark:text-blue-400" />
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Setting up your workspace...</h2>
-          <p className="text-gray-600 dark:text-zinc-400">Creating your new document</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  if (!document) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Document not found</h2>
-          <p className="text-gray-600 dark:text-zinc-400 mb-4">The document you're looking for doesn't exist.</p>
-          <Link href="/dashboard">
-            <Button className="bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-900 dark:text-white border border-gray-200 dark:border-zinc-700">Back to Dashboard</Button>
-          </Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
       </div>
     );
+  }
+
+  if (!isSignedIn) {
+    return null;
   }
 
   return (
@@ -401,6 +403,21 @@ export default function ResultsPage() {
               <span className="text-xs md:text-sm text-gray-600 dark:text-zinc-400 hidden sm:inline">Overall score</span>
               <span className="text-xs text-gray-600 dark:text-zinc-400 sm:hidden">Score</span>
             </div>
+
+            {/* Save indicator */}
+            {isSaving && (
+              <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-zinc-400">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                <span>Saving...</span>
+              </div>
+            )}
+
+            {/* Save error indicator */}
+            {saveError && (
+              <div className="text-xs text-red-500 dark:text-red-400">
+                Save failed
+              </div>
+            )}
 
             {/* Theme Switcher */}
             <ThemeSwitcher />

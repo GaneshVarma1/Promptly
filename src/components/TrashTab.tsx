@@ -11,35 +11,31 @@ import { useDocuments } from '@/hooks/use-documents';
 export function TrashTab() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const { documents, setStatus, deleteDocument, deleteAllSaved } = useDocuments();
+  const { documents, setStatus, deleteDocument, loading, error } = useDocuments();
 
   const trashedDocuments = useMemo(() => {
-    const trashed = documents.filter(doc => {
-      const status = localStorage.getItem(`status-${doc.id}`);
-      return status === 'trash';
-    });
-    
+    const trashed = documents.filter(doc => doc.status === 'trash');
     if (!searchQuery.trim()) return trashed;
-    
-    return trashed.filter(doc => 
+    return trashed.filter(doc =>
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [documents, searchQuery]);
 
   const getIsSaved = (id: string) => {
-    return localStorage.getItem(`status-${id}`) === 'saved';
+    const doc = documents.find(d => d.id === id);
+    return doc?.status === 'saved';
   };
 
-  const handleRestore = (id: string) => {
-    setStatus(id, 'active');
+  const handleRestore = async (id: string) => {
+    await setStatus(id, 'active');
   };
 
-  const handleRestoreAll = () => {
+  const handleRestoreAll = async () => {
     if (confirm('Are you sure you want to restore all prompts from trash? They will be moved back to your active prompts.')) {
-      trashedDocuments.forEach(doc => {
-        setStatus(doc.id, 'active');
-      });
+      for (const doc of trashedDocuments) {
+        await setStatus(doc.id, 'active');
+      }
     }
   };
 
@@ -47,21 +43,23 @@ export function TrashTab() {
     router.push(`/results?id=${id}`);
   };
 
-  const handlePermanentDelete = () => {
-    if (confirm('Are you sure you want to permanently delete all prompts in trash? This action cannot be undone.')) {
-      // Delete all trashed documents permanently
-      trashedDocuments.forEach(doc => {
-        localStorage.removeItem(`document-${doc.id}`);
-        localStorage.removeItem(`status-${doc.id}`);
-        localStorage.removeItem(`score-${doc.id}`);
-        localStorage.removeItem(`title-${doc.id}`);
-      });
-      // Trigger documents update
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('documents-updated'));
-      }
-    }
-  };
+  // Optionally implement permanent delete with Supabase here
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300 dark:border-gray-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -85,18 +83,10 @@ export function TrashTab() {
               <RotateCcw className="w-4 h-4 mr-2" />
               Restore All
             </Button>
-            <Button 
-              onClick={handlePermanentDelete}
-              variant="destructive"
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              <TrashIcon className="w-4 h-4 mr-2" />
-              Empty Trash
-            </Button>
+            {/* Permanent delete can be implemented here if needed */}
           </div>
         )}
       </div>
-
       {/* Search */}
       <div className="relative">
         <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -108,7 +98,6 @@ export function TrashTab() {
           className="pl-10 bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700"
         />
       </div>
-
       {/* Documents Grid */}
       {trashedDocuments.length === 0 ? (
         <div className="text-center py-12">
@@ -141,7 +130,6 @@ export function TrashTab() {
               </div>
             </div>
           </div>
-          
           <DocumentGrid 
             documents={trashedDocuments}
             getIsSaved={getIsSaved}

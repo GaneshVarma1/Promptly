@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { supabase } from '@/lib/ai-client';
 
 export interface DocumentCounts {
   documents: number;
@@ -7,60 +9,37 @@ export interface DocumentCounts {
 }
 
 export function useDocumentCounts() {
+  const { user, isLoaded } = useUser();
   const [counts, setCounts] = useState<DocumentCounts>({ documents: 0, saved: 0, trash: 0 });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const cleanupAndCalculateCounts = useCallback(() => {
-    let documents = 0;
-    let saved = 0;
-    let trash = 0;
-    const validIds = new Set<string>();
-    
-    // First, collect all valid document IDs
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('document-')) {
-        const documentId = key.replace('document-', '');
-        const value = localStorage.getItem(key);
-        if (value !== null) { // Allow empty strings as valid documents
-          validIds.add(documentId);
-        } else {
-          localStorage.removeItem(key);
-        }
-      }
+  const fetchCounts = useCallback(async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select('status', { count: 'exact', head: false })
+        .eq('user_id', user.id);
+      if (error) throw error;
+      const documents = data.filter((d: any) => d.status === 'active').length;
+      const saved = data.filter((d: any) => d.status === 'saved').length;
+      const trash = data.filter((d: any) => d.status === 'trash').length;
+      setCounts({ documents, saved, trash });
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch document counts');
+    } finally {
+      setLoading(false);
     }
-    
-    // Count documents by their status (or default to 'active')
-    validIds.forEach(documentId => {
-      const status = localStorage.getItem(`status-${documentId}`) || 'active';
-      if (status === 'active') documents++;
-      else if (status === 'saved') saved++;
-      else if (status === 'trash') trash++;
-    });
-    
-    // Clean up orphaned status keys
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('status-')) {
-        const documentId = key.replace('status-', '');
-        if (!validIds.has(documentId)) {
-          localStorage.removeItem(key);
-        }
-      }
-    }
-    
-    setCounts({ documents, saved, trash });
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
-    cleanupAndCalculateCounts();
-    const handleUpdate = () => cleanupAndCalculateCounts();
-    window.addEventListener('documents-updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
-    return () => {
-      window.removeEventListener('documents-updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
-    };
-  }, [cleanupAndCalculateCounts]);
+    if (isLoaded && user?.id) {
+      fetchCounts();
+    }
+  }, [isLoaded, user?.id, fetchCounts]);
 
-  return counts;
+  return { ...counts, loading, error, reload: fetchCounts };
 } 

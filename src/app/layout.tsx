@@ -190,6 +190,10 @@ export default function RootLayout({
         style={{ backgroundColor: "#020617", colorScheme: "dark" }}
       >
         <head>
+          <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+          <link rel="apple-touch-icon" href="/favicon.png" />
+          <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)" />
+          <meta name="theme-color" content="#fff" media="(prefers-color-scheme: light)" />
           {/* Structured Data for SEO */}
           <script
             type="application/ld+json"

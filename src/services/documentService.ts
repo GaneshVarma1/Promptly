@@ -20,6 +20,7 @@ import {
   REGEX_PATTERNS 
 } from '@/constants';
 import { sanitizeInput } from '@/lib/utils';
+import { supabase } from '@/lib/ai-client';
 
 /**
  * Document query parameters for filtering and pagination
@@ -55,137 +56,84 @@ export class DocumentService {
   private readonly eventListeners = new Map<string, Set<(document: Document) => void>>();
 
   /**
-   * Create a new document
+   * Create a new document for a user
    */
-  async createDocument(
-    request: CreateDocumentRequest, 
-    userId: string
-  ): Promise<ApiResponse<Document>> {
+  async createDocument(document: Document, userId: string): Promise<ApiResponse<Document>> {
     try {
-      this.validateCreateRequest(request);
-      
-      const document: Document = {
-        id: this.generateDocumentId(),
-        title: sanitizeInput(request.title),
-        content: sanitizeInput(request.content),
-        status: 'draft',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-        userId,
-        metadata: {
-          wordCount: this.countWords(request.content),
-          readingTime: this.calculateReadingTime(request.content),
-          ...request.metadata,
-        },
-      };
-
-      await this.saveDocument(document);
-      this.updateCache(document);
-      this.notifyListeners('created', document);
-
-      return {
-        success: true,
-        data: document,
-        timestamp: new Date().toISOString(),
-      };
+      const { data, error } = await supabase
+        .from('documents')
+        .insert([{ ...document, user_id: userId }])
+        .select()
+        .single();
+      if (error) throw error;
+      return { success: true, data, timestamp: new Date().toISOString() };
     } catch (error) {
       return this.handleError(error);
     }
   }
 
   /**
-   * Update an existing document
-   */
-  async updateDocument(
-    id: string, 
-    request: UpdateDocumentRequest, 
-    userId: string
-  ): Promise<ApiResponse<Document>> {
-    try {
-      const existingDocument = await this.getDocumentById(id, userId);
-      if (!existingDocument.success || !existingDocument.data) {
-        return {
-          success: false,
-          error: 'Document not found',
-          timestamp: new Date().toISOString(),
-        };
-      }
-
-      this.validateUpdateRequest(request);
-
-      const updatedDocument: Document = {
-        ...existingDocument.data,
-        ...request,
-        title: request.title ? sanitizeInput(request.title) : existingDocument.data.title,
-        content: request.content ? sanitizeInput(request.content) : existingDocument.data.content,
-        updatedAt: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-        metadata: {
-          ...existingDocument.data.metadata,
-          ...request.metadata,
-          wordCount: request.content ? this.countWords(request.content) : existingDocument.data.metadata?.wordCount,
-          readingTime: request.content ? this.calculateReadingTime(request.content) : existingDocument.data.metadata?.readingTime,
-        },
-      };
-
-      await this.saveDocument(updatedDocument);
-      this.updateCache(updatedDocument);
-      this.notifyListeners('updated', updatedDocument);
-
-      return {
-        success: true,
-        data: updatedDocument,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  /**
-   * Get document by ID
+   * Get document by ID for a user
    */
   async getDocumentById(id: string, userId: string): Promise<ApiResponse<Document>> {
     try {
-      // Check cache first
-      const cachedDocument = this.cache.get(id);
-      if (cachedDocument && cachedDocument.userId === userId) {
-        return {
-          success: true,
-          data: cachedDocument,
-          timestamp: new Date().toISOString(),
-        };
-      }
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', userId)
+        .single();
+      if (error) throw error;
+      return { success: true, data, timestamp: new Date().toISOString() };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 
-      // Load from storage
-      const documentData = localStorage.getItem(`${this.storagePrefix}${id}`);
-      if (!documentData) {
-        return {
-          success: false,
-          error: 'Document not found',
-          timestamp: new Date().toISOString(),
-        };
-      }
+  /**
+   * Get all documents for a user
+   */
+  async getAllDocuments(userId: string): Promise<Document[]> {
+    const { data, error } = await supabase
+      .from('documents')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
 
-      const document: Document = JSON.parse(documentData);
-      
-      // Verify ownership
-      if (document.userId !== userId) {
-        return {
-          success: false,
-          error: 'Unauthorized access',
-          timestamp: new Date().toISOString(),
-        };
-      }
+  /**
+   * Update a document for a user
+   */
+  async updateDocument(id: string, updates: Partial<Document>, userId: string): Promise<ApiResponse<Document>> {
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .update(updates)
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return { success: true, data, timestamp: new Date().toISOString() };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 
-      this.updateCache(document);
-
-      return {
-        success: true,
-        data: document,
-        timestamp: new Date().toISOString(),
-      };
+  /**
+   * Delete a document for a user
+   */
+  async deleteDocument(id: string, userId: string): Promise<ApiResponse<null>> {
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+      if (error) throw error;
+      return { success: true, data: null, timestamp: new Date().toISOString() };
     } catch (error) {
       return this.handleError(error);
     }
@@ -261,27 +209,6 @@ export class DocumentService {
       return {
         success: true,
         data: response,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  /**
-   * Delete a document (soft delete by changing status)
-   */
-  async deleteDocument(id: string, userId: string): Promise<ApiResponse<void>> {
-    try {
-      const result = await this.updateDocument(id, { status: 'deleted' }, userId);
-      
-      if (result.success && result.data) {
-        this.notifyListeners('deleted', result.data);
-      }
-
-      return {
-        success: result.success,
-        error: result.error,
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -464,30 +391,6 @@ export class DocumentService {
     } catch (error) {
       throw new Error('Failed to save document. Storage might be full.');
     }
-  }
-
-  private async getAllDocuments(userId: string): Promise<Document[]> {
-    const documents: Document[] = [];
-    
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(this.storagePrefix)) {
-        try {
-          const documentData = localStorage.getItem(key);
-          if (documentData) {
-            const document: Document = JSON.parse(documentData);
-            if (document.userId === userId) {
-              documents.push(document);
-            }
-          }
-        } catch (error) {
-          // Skip invalid documents
-          console.warn(`Failed to parse document: ${key}`);
-        }
-      }
-    }
-    
-    return documents;
   }
 
   private updateCache(document: Document): void {
