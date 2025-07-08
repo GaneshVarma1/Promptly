@@ -214,6 +214,12 @@ export default function ResultsPage() {
   useEffect(() => {
     if (!id || !user?.id) return;
     
+    // Don't save if content hasn't actually changed from the original document
+    if (document && content === document.content && 
+        editedTitle === (document.title || '')) {
+      return;
+    }
+    
     const saveDocument = async () => {
       setIsSaving(true);
       setSaveError(null);
@@ -228,9 +234,6 @@ export default function ResultsPage() {
           lastModified: new Date().toISOString(),
         };
         
-        // Optimistic update
-        setDocument((prev) => prev ? { ...prev, ...updateData } : prev);
-        
         const { error } = await supabase
           .from('documents')
           .update(updateData)
@@ -240,23 +243,22 @@ export default function ResultsPage() {
         if (error) {
           console.error('Supabase update error:', error.message);
           setSaveError(error.message);
-          // Revert optimistic update on error
-          setDocument((prev) => prev ? { ...prev, ...document } : prev);
+        } else {
+          // Only update local state after successful save
+          setDocument((prev) => prev ? { ...prev, ...updateData } : prev);
         }
       } catch (err) {
         console.error('Failed to save document:', err);
         setSaveError(err instanceof Error ? err.message : 'Failed to save');
-        // Revert optimistic update on error
-        setDocument((prev) => prev ? { ...prev, ...document } : prev);
       } finally {
         setIsSaving(false);
       }
     };
     
     // Debounce to avoid excessive writes
-    const timeoutId = setTimeout(saveDocument, 800);
+    const timeoutId = setTimeout(saveDocument, 1000);
     return () => clearTimeout(timeoutId);
-  }, [content, editedTitle, analysis, selectedModel, id, user?.id, document]);
+  }, [content, editedTitle, analysis, selectedModel, id, user?.id]); // Removed document from dependencies
 
   // Update title in Supabase
   const handleTitleSave = useCallback(() => {
