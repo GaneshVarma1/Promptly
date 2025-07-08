@@ -109,7 +109,7 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
             </div>
             <div className="flex items-center gap-2">
               <ThemeSwitcher />
-              <button className="md:hidden p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors" onClick={onClose} aria-label="Close sidebar">
+              <button className="md:hidden p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all duration-200 hover:scale-110" onClick={onClose} aria-label="Close sidebar">
                 <Menu className="w-4 h-4 text-gray-600 dark:text-zinc-400" />
               </button>
             </div>
@@ -273,8 +273,8 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
 
             {/* Upgrade Section */}
             <div className="pt-2 mt-2 border-t border-gray-100 dark:border-zinc-800">
-              <GradientButton className="w-full text-sm py-2.5 px-3 min-w-0" onClick={() => console.log('Get Pro clicked')}>
-                <ShieldCheck className="w-4 h-4 mr-2" />
+              <GradientButton className="w-full text-sm py-2.5 px-3 min-w-0 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg" onClick={() => console.log('Get Pro clicked')}>
+                <ShieldCheck className="w-4 h-4 mr-2 transition-all duration-200 group-hover:scale-110 group-hover:rotate-3" />
                 Upgrade Pro
               </GradientButton>
             </div>
@@ -283,19 +283,14 @@ export function DashboardSidebar({ currentTab = 'documents', onTabChange, isOpen
 
         {/* User section - Always at bottom */}
         <div className="flex-shrink-0 p-2 border-t border-gray-100 dark:border-zinc-800 pb-[env(safe-area-inset-bottom,0.5rem)]">
-          <div className="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded-lg transition-colors cursor-pointer">
-            <UserButton 
-              afterSignOutUrl="/"
-              appearance={{
-                elements: {
-                  avatarBox: "w-8 h-8 ring-2 ring-white dark:ring-zinc-700 shadow-sm",
-                  userButtonPopoverCard: "shadow-xl border border-gray-200 dark:border-zinc-700",
-                  userButtonPopoverActionButton: "hover:bg-gray-100 dark:hover:bg-zinc-800",
-                },
-              }}
-            />
+          <div className="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded-lg transition-all duration-200 cursor-pointer group">
+            <div className="transition-all duration-200 group-hover:scale-105">
+              <UserButton 
+                afterSignOutUrl="/"
+              />
+            </div>
             <div className="flex flex-col items-start flex-1 min-w-0">
-              <span className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+              <span className="text-xs font-semibold text-gray-900 dark:text-white truncate transition-all duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
                 {user?.firstName || user?.fullName || 'User'}
               </span>
               <span className="text-xs text-gray-500 dark:text-zinc-400 truncate">
@@ -317,14 +312,16 @@ function SectionHeader({ title, isExpanded, onToggle }: {
   return (
     <button
       onClick={onToggle}
-      className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-zinc-300 transition-colors"
+      className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-zinc-300 transition-all duration-200 group"
     >
-      <span>{title}</span>
-      {isExpanded ? (
-        <ChevronDown className="w-3 h-3" />
-      ) : (
-        <ChevronRight className="w-3 h-3" />
-      )}
+      <span className="transition-all duration-200 group-hover:translate-x-1">{title}</span>
+      <div className="transition-all duration-200 group-hover:scale-110">
+        {isExpanded ? (
+          <ChevronDown className="w-3 h-3 transition-transform duration-200" />
+        ) : (
+          <ChevronRight className="w-3 h-3 transition-transform duration-200" />
+        )}
+      </div>
     </button>
   );
 }
@@ -350,7 +347,7 @@ function SidebarLink({
   count?: number;
   badge?: string;
 }) {
-  const baseStyles = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 w-full text-left relative overflow-hidden`;
+  const baseStyles = `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 w-full text-left relative overflow-hidden group`;
   
   const getStyles = () => {
     if (disabled) {
@@ -368,22 +365,24 @@ function SidebarLink({
   const content = (
     <>
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        {icon}
+        <div className="transition-all duration-200 group-hover:scale-110 group-hover:rotate-3 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+          {icon}
+        </div>
         <span className="font-medium truncate">{label}</span>
       </div>
       <div className="flex items-center gap-1">
         {count !== undefined && count > 0 && (
-          <span className="text-xs bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300 px-1.5 py-0.5 rounded-full font-medium">
+          <span className="text-xs bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300 px-1.5 py-0.5 rounded-full font-medium transition-all duration-200 group-hover:scale-105 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30">
             {count}
           </span>
         )}
         {badge && (
-          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5 transition-all duration-200 group-hover:scale-105">
             {badge}
           </Badge>
         )}
         {isPro && (
-          <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+          <span className="text-xs bg-white/20 px-2 py-1 rounded-full transition-all duration-200 group-hover:scale-105 group-hover:bg-white/30">
             Pro
           </span>
         )}
