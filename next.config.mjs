@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_HUGGING_FACE_API_KEY: process.env.NEXT_PUBLIC_HUGGING_FACE_API_KEY,
+    NEXT_PUBLIC_HUGGING_FACE_API_KEY:
+      process.env.NEXT_PUBLIC_HUGGING_FACE_API_KEY,
   },
   typescript: {
     ignoreBuildErrors: true,
@@ -12,7 +13,7 @@ const nextConfig = {
   },
   // Improve dynamic route handling
   experimental: {
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ["lucide-react"],
   },
   // Better chunk handling
   webpack: (config, { isServer }) => {
@@ -26,8 +27,8 @@ const nextConfig = {
   },
   // Ensure proper dynamic route generation
   generateBuildId: async () => {
-    return 'build-' + Date.now().toString(36);
+    return "build-" + Date.now().toString(36);
   },
-}
+};
 
-module.exports = nextConfig 
+export default nextConfig;
