@@ -4,20 +4,20 @@
  * @version 2.0.0
  */
 
-import { 
-  AIAnalysisResult, 
-  AnalysisRequest, 
-  AnalysisOptions, 
+import {
+  AIAnalysisResult,
+  AnalysisRequest,
+  AnalysisOptions,
   ModelType,
-  ApiResponse 
-} from '@/types';
-import { 
-  API_CONFIG, 
-  AI_MODELS, 
-  MODEL_FALLBACKS, 
-  ERROR_MESSAGES, 
-  SCORING_CONFIG 
-} from '@/constants';
+  ApiResponse,
+} from "@/types";
+import {
+  API_CONFIG,
+  AI_MODELS,
+  MODEL_FALLBACKS,
+  ERROR_MESSAGES,
+  SCORING_CONFIG,
+} from "@/constants";
 
 /**
  * AI Service Configuration Interface
@@ -57,17 +57,65 @@ interface RetryConfig {
 
 /**
  * Enterprise AI Analysis Service
- * Implements circuit breaker, retry logic, and fallback mechanisms
+ * Implements circuit breaker, retry logic, and fallback mechanisms for robust AI prompt analysis
+ *
+ * @example
+ * ```typescript
+ * // Initialize the service
+ * const aiService = new AIAnalysisService({
+ *   apiKey: 'your-api-key',
+ *   timeout: 30000,
+ *   maxRetries: 3
+ * });
+ *
+ * // Basic usage
+ * const result = await aiService.analyzePrompt({
+ *   text: 'Write a professional email about project delays',
+ *   model: 'llama-70b'
+ * });
+ *
+ * if (result.success) {
+ *   console.log('Score:', result.data.score);
+ *   console.log('Suggestions:', result.data.suggestions);
+ * }
+ * ```
  */
 export class AIAnalysisService {
   private readonly config: AIServiceConfig;
   private readonly retryConfig: RetryConfig;
-  private readonly circuitBreaker: Map<ModelType, { failures: number; lastFailure: number }>;
+  private readonly circuitBreaker: Map<
+    ModelType,
+    { failures: number; lastFailure: number }
+  >;
   private readonly rateLimiter: Map<ModelType, number>;
 
+  /**
+   * Initialize the AI Analysis Service with configuration options
+   *
+   * @param config - Partial configuration object for the service
+   * @param config.apiKey - API key for Together AI service
+   * @param config.baseUrl - Base URL for the AI service API
+   * @param config.timeout - Request timeout in milliseconds
+   * @param config.maxRetries - Maximum number of retry attempts
+   *
+   * @throws {Error} When API key is not provided
+   *
+   * @example
+   * ```typescript
+   * // With custom configuration
+   * const aiService = new AIAnalysisService({
+   *   apiKey: process.env.TOGETHER_API_KEY,
+   *   timeout: 45000,
+   *   maxRetries: 5
+   * });
+   *
+   * // With default configuration (uses environment variables)
+   * const aiService = new AIAnalysisService();
+   * ```
+   */
   constructor(config: Partial<AIServiceConfig> = {}) {
     this.config = {
-      apiKey: process.env.TOGETHER_API_KEY || '',
+      apiKey: process.env.TOGETHER_API_KEY || "",
       baseUrl: API_CONFIG.TOGETHER_AI.BASE_URL,
       timeout: API_CONFIG.TOGETHER_AI.TIMEOUT,
       maxRetries: API_CONFIG.TOGETHER_AI.RETRY_ATTEMPTS,
@@ -89,16 +137,64 @@ export class AIAnalysisService {
 
   /**
    * Analyze a prompt with comprehensive error handling and fallbacks
+   *
+   * @param request - The analysis request containing text and options
+   * @param request.text - The prompt text to analyze (max 10,000 characters)
+   * @param request.model - The AI model to use for analysis
+   * @param request.options - Additional analysis options
+   * @param request.options.includeRewrites - Whether to include rewritten versions
+   * @param request.options.includeSuggestions - Whether to include improvement suggestions
+   * @param request.options.maxSuggestions - Maximum number of suggestions to return
+   * @param request.options.detailedAnalysis - Whether to provide detailed explanations
+   * @param request.options.targetTone - Target tone for the analysis
+   *
+   * @returns Promise<ApiResponse<AIAnalysisResult>> - Complete analysis result with scores, suggestions, and metadata
+   *
+   * @throws {Error} When text is empty, too long, or invalid model is specified
+   *
+   * @example
+   * ```typescript
+   * // Basic prompt analysis
+   * const result = await aiService.analyzePrompt({
+   *   text: 'Create a marketing strategy for a new product',
+   *   model: 'llama-70b'
+   * });
+   *
+   * // With detailed options
+   * const detailedResult = await aiService.analyzePrompt({
+   *   text: 'Write a technical documentation for API',
+   *   model: 'exaone-32b',
+   *   options: {
+   *     includeRewrites: true,
+   *     includeSuggestions: true,
+   *     maxSuggestions: 10,
+   *     detailedAnalysis: true,
+   *     targetTone: 'professional'
+   *   }
+   * });
+   *
+   * // Handle results
+   * if (result.success) {
+   *   const { score, suggestions, improvements, rewrites } = result.data;
+   *   console.log(`Overall Score: ${score.overall}/100`);
+   *   console.log(`Suggestions: ${suggestions.length}`);
+   *   console.log(`Processing Time: ${result.data.processingTime}ms`);
+   * } else {
+   *   console.error('Analysis failed:', result.error);
+   * }
+   * ```
    */
-  async analyzePrompt(request: AnalysisRequest): Promise<ApiResponse<AIAnalysisResult>> {
+  async analyzePrompt(
+    request: AnalysisRequest
+  ): Promise<ApiResponse<AIAnalysisResult>> {
     const startTime = Date.now();
-    
+
     try {
       this.validateRequest(request);
-      
-      const model = request.model || 'llama-70b';
+
+      const model = request.model || "llama-70b";
       const options = this.mergeOptions(request.options);
-      
+
       // Check circuit breaker
       if (this.isCircuitOpen(model)) {
         throw new Error(`Circuit breaker open for model: ${model}`);
@@ -107,14 +203,24 @@ export class AIAnalysisService {
       // Apply rate limiting
       await this.applyRateLimit(model);
 
-      let result = await this.performAnalysisWithRetry(request.text, model, options);
-      
+      let result = await this.performAnalysisWithRetry(
+        request.text,
+        model,
+        options
+      );
+
       if (!result) {
         // Try fallback model
         const fallbackModel = MODEL_FALLBACKS[model];
         if (fallbackModel && fallbackModel !== model) {
-          console.warn(`Primary model ${model} failed, trying fallback: ${fallbackModel}`);
-          result = await this.performAnalysisWithRetry(request.text, fallbackModel, options);
+          console.warn(
+            `Primary model ${model} failed, trying fallback: ${fallbackModel}`
+          );
+          result = await this.performAnalysisWithRetry(
+            request.text,
+            fallbackModel,
+            options
+          );
         }
       }
 
@@ -126,7 +232,7 @@ export class AIAnalysisService {
       this.recordSuccess(model);
 
       const processingTime = Date.now() - startTime;
-      
+
       const analysisResult: AIAnalysisResult = {
         ...result,
         processingTime,
@@ -144,17 +250,39 @@ export class AIAnalysisService {
         data: analysisResult,
         timestamp: new Date().toISOString(),
       };
-
     } catch (error) {
-      this.recordFailure(request.model || 'llama-70b');
+      this.recordFailure(request.model || "llama-70b");
       return this.handleError(error);
     }
   }
 
   /**
-   * Get available models with their current status
+   * Get available models with their current operational status
+   *
+   * @returns Promise<ApiResponse<Array<ModelStatus>>> - List of models with availability status
+   *
+   * @example
+   * ```typescript
+   * const modelsResult = await aiService.getAvailableModels();
+   *
+   * if (modelsResult.success) {
+   *   modelsResult.data.forEach(model => {
+   *     console.log(`${model.model}: ${model.available ? 'Available' : 'Unavailable'}`);
+   *     console.log(`Last checked: ${model.lastChecked}`);
+   *   });
+   *
+   *   // Filter only available models
+   *   const availableModels = modelsResult.data
+   *     .filter(model => model.available)
+   *     .map(model => model.model);
+   * }
+   * ```
    */
-  async getAvailableModels(): Promise<ApiResponse<Array<{ model: ModelType; available: boolean; lastChecked: string }>>> {
+  async getAvailableModels(): Promise<
+    ApiResponse<
+      Array<{ model: ModelType; available: boolean; lastChecked: string }>
+    >
+  > {
     try {
       const models = Object.keys(AI_MODELS) as ModelType[];
       const modelStatus = await Promise.allSettled(
@@ -169,8 +297,11 @@ export class AIAnalysisService {
       );
 
       const results = modelStatus
-        .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-        .map(result => result.value);
+        .filter(
+          (result): result is PromiseFulfilledResult<any> =>
+            result.status === "fulfilled"
+        )
+        .map((result) => result.value);
 
       return {
         success: true,
@@ -183,40 +314,71 @@ export class AIAnalysisService {
   }
 
   /**
-   * Batch analyze multiple prompts
+   * Batch analyze multiple prompts in parallel with error handling
+   *
+   * @param requests - Array of analysis requests (max 10 requests)
+   * @returns Promise<ApiResponse<AIAnalysisResult[]>> - Array of successful analysis results
+   *
+   * @throws {Error} When no requests provided or batch size exceeds 10
+   *
+   * @example
+   * ```typescript
+   * // Batch analysis of multiple prompts
+   * const batchRequests = [
+   *   { text: 'Write a blog post about AI', model: 'llama-70b' as ModelType },
+   *   { text: 'Create a product description', model: 'llama-8b' as ModelType },
+   *   { text: 'Draft a professional email', model: 'exaone-32b' as ModelType }
+   * ];
+   *
+   * const batchResult = await aiService.batchAnalyze(batchRequests);
+   *
+   * if (batchResult.success) {
+   *   batchResult.data.forEach((result, index) => {
+   *     console.log(`Prompt ${index + 1}:`);
+   *     console.log(`  Score: ${result.score.overall}/100`);
+   *     console.log(`  Model: ${result.model}`);
+   *     console.log(`  Processing Time: ${result.processingTime}ms`);
+   *   });
+   *
+   *   // Calculate average scores
+   *   const avgScore = batchResult.data.reduce((sum, r) => sum + r.score.overall, 0) / batchResult.data.length;
+   *   console.log(`Average Score: ${avgScore.toFixed(1)}/100`);
+   * }
+   * ```
    */
   async batchAnalyze(
     requests: AnalysisRequest[]
   ): Promise<ApiResponse<AIAnalysisResult[]>> {
     try {
       if (requests.length === 0) {
-        throw new Error('No requests provided for batch analysis');
+        throw new Error("No requests provided for batch analysis");
       }
 
       if (requests.length > 10) {
-        throw new Error('Batch size limited to 10 requests');
+        throw new Error("Batch size limited to 10 requests");
       }
 
       const results = await Promise.allSettled(
-        requests.map(request => this.analyzePrompt(request))
+        requests.map((request) => this.analyzePrompt(request))
       );
 
       const successfulResults: AIAnalysisResult[] = [];
       const errors: string[] = [];
 
       results.forEach((result, index) => {
-        if (result.status === 'fulfilled' && result.value.success) {
+        if (result.status === "fulfilled" && result.value.success) {
           successfulResults.push(result.value.data!);
         } else {
-          const error = result.status === 'rejected' 
-            ? result.reason 
-            : result.value.error || 'Unknown error';
+          const error =
+            result.status === "rejected"
+              ? result.reason
+              : result.value.error || "Unknown error";
           errors.push(`Request ${index + 1}: ${error}`);
         }
       });
 
       if (successfulResults.length === 0) {
-        throw new Error(`All batch requests failed: ${errors.join('; ')}`);
+        throw new Error(`All batch requests failed: ${errors.join("; ")}`);
       }
 
       return {
@@ -224,7 +386,6 @@ export class AIAnalysisService {
         data: successfulResults,
         timestamp: new Date().toISOString(),
       };
-
     } catch (error) {
       return this.handleError(error);
     }
@@ -232,61 +393,114 @@ export class AIAnalysisService {
 
   // Private helper methods
 
+  /**
+   * Perform analysis with exponential backoff retry mechanism
+   *
+   * @private
+   * @param text - The text to analyze
+   * @param model - The AI model to use
+   * @param options - Analysis options
+   * @returns Promise<AIAnalysisResult | null> - Analysis result or null if all retries failed
+   *
+   * @example
+   * ```typescript
+   * // This is a private method, but here's how it works internally:
+   * // 1st attempt: immediate
+   * // 2nd attempt: after 1000ms delay
+   * // 3rd attempt: after 2000ms delay
+   * // If all fail, returns null and triggers fallback
+   * ```
+   */
   private async performAnalysisWithRetry(
-    text: string, 
-    model: ModelType, 
+    text: string,
+    model: ModelType,
     options: AnalysisOptions
-  ): Promise<Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'> | null> {
+  ): Promise<Omit<
+    AIAnalysisResult,
+    "processingTime" | "model" | "metadata"
+  > | null> {
     for (let attempt = 1; attempt <= this.retryConfig.maxAttempts; attempt++) {
       try {
         return await this.callAIAPI(text, model, options);
       } catch (error) {
-        console.warn(`Analysis attempt ${attempt} failed for model ${model}:`, error);
-        
+        console.warn(
+          `Analysis attempt ${attempt} failed for model ${model}:`,
+          error
+        );
+
         if (attempt === this.retryConfig.maxAttempts) {
           throw error;
         }
 
         // Calculate exponential backoff delay
         const delay = Math.min(
-          this.retryConfig.baseDelay * Math.pow(this.retryConfig.backoffMultiplier, attempt - 1),
+          this.retryConfig.baseDelay *
+            Math.pow(this.retryConfig.backoffMultiplier, attempt - 1),
           this.retryConfig.maxDelay
         );
-        
+
         await this.sleep(delay);
       }
     }
-    
+
     return null;
   }
 
   /**
-   * Call AI API with fallback to mock data for development
+   * Call the AI API with comprehensive error handling and mock fallback
+   *
+   * @private
+   * @param text - The text to analyze
+   * @param model - The AI model to use
+   * @param options - Analysis options
+   * @returns Promise<AIAnalysisResult> - Raw analysis result from API
+   *
+   * @throws {Error} When API call fails after all retries
+   *
+   * @example
+   * ```typescript
+   * // Internal API call structure:
+   * // POST /v1/chat/completions
+   * // {
+   * //   "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+   * //   "messages": [{"role": "user", "content": "..."}],
+   * //   "max_tokens": 4096,
+   * //   "temperature": 0.7
+   * // }
+   *
+   * // If no API key is configured, returns mock data:
+   * // {
+   * //   score: { clarity: 85, context: 80, format: 85, overall: 83 },
+   * //   suggestions: ["Add more context", "Be more specific"],
+   * //   improvements: ["Include examples", "Define expected output"],
+   * //   // ... more fields
+   * // }
+   * ```
    */
   private async callAIAPI(
-    text: string, 
-    model: ModelType, 
+    text: string,
+    model: ModelType,
     options: AnalysisOptions
-  ): Promise<Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'>> {
+  ): Promise<Omit<AIAnalysisResult, "processingTime" | "model" | "metadata">> {
     // If no API key, return mock data for development
     if (!this.config.apiKey) {
-      console.log('🔧 Using mock AI response for development');
+      console.log("🔧 Using mock AI response for development");
       return this.generateFallbackAnalysis(text, model);
     }
 
     const prompt = this.buildAnalysisPrompt(text, options, model);
-    
+
     const response = await fetch(`${this.config.baseUrl}/v1/chat/completions`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.apiKey}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.config.apiKey}`,
       },
       body: JSON.stringify({
         model: this.getModelProvider(model),
         messages: [
           {
-            role: 'user',
+            role: "user",
             content: prompt,
           },
         ],
@@ -302,22 +516,53 @@ export class AIAnalysisService {
     }
 
     const data: TogetherAIResponse = await response.json();
-    
+
     if (!data.choices || data.choices.length === 0) {
-      throw new Error('No response from AI model');
+      throw new Error("No response from AI model");
     }
 
     const content = data.choices[0].message.content;
     const parsed = this.parseAnalysisResponse(content, text, model);
     this.validateAnalysisResponse(parsed);
-    
+
     return parsed;
   }
 
-  private buildAnalysisPrompt(text: string, options: AnalysisOptions, model: ModelType = 'llama-70b'): string {
+  /**
+   * Build analysis prompt with model-specific instructions
+   *
+   * @private
+   * @param text - The text to analyze
+   * @param options - Analysis options
+   * @param model - The AI model to use
+   * @returns string - Formatted prompt for the AI model
+   *
+   * @example
+   * ```typescript
+   * // Generated prompt structure:
+   * // "You are an expert prompt engineer... [model-specific instructions]
+   * //
+   * // Analyze the following prompt and provide analysis in JSON format:
+   * // "[user's text]"
+   * //
+   * // Please provide your analysis as a valid JSON object with this structure:
+   * // { "score": {...}, "suggestions": [...], ... }
+   * //
+   * // Focus on:
+   * // - Clarity and specificity of instructions
+   * // - Appropriate context and background information
+   * // - Proper formatting and structure
+   * // - Overall effectiveness for AI interaction"
+   * ```
+   */
+  private buildAnalysisPrompt(
+    text: string,
+    options: AnalysisOptions,
+    model: ModelType = "llama-70b"
+  ): string {
     const modelConfig = this.getModelConfig(model);
     const modelSpecificInstructions = this.getModelSpecificInstructions(model);
-    
+
     const basePrompt = `
 ${modelSpecificInstructions}
 
@@ -346,112 +591,219 @@ Focus on:
 - Appropriate context and background information
 - Proper formatting and structure
 - Overall effectiveness for AI interaction
-${options.targetTone ? `\n- Target tone: ${options.targetTone}` : ''}
-${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' : ''}
+${options.targetTone ? `\n- Target tone: ${options.targetTone}` : ""}
+${
+  options.detailedAnalysis
+    ? "\n- Provide detailed explanations for each score"
+    : ""
+}
 `;
 
     return basePrompt.trim();
   }
 
+  /**
+   * Get model-specific instructions for analysis
+   *
+   * @private
+   * @param model - The AI model type
+   * @returns string - Model-specific instruction text
+   *
+   * @example
+   * ```typescript
+   * // Examples of model-specific instructions:
+   * // llama-70b: "You are an expert prompt engineer with deep expertise..."
+   * // llama-3b: "You are a helpful prompt assistant. Provide clear, straightforward analysis..."
+   * // mixtral-8x7b: "You are a creative prompt specialist with expertise in diverse domains..."
+   * ```
+   */
   private getModelSpecificInstructions(model: ModelType): string {
     const instructions = {
-      'llama-70b': 'You are an expert prompt engineer with deep expertise in large language models. Provide comprehensive, detailed analysis with sophisticated insights.',
-      'llama-8b': 'You are a skilled prompt analyst focused on practical improvements. Provide balanced analysis with actionable recommendations.',
-      'llama-3b': 'You are a helpful prompt assistant. Provide clear, straightforward analysis with simple, easy-to-understand suggestions.',
-      'llama-11b-vision': 'You are a multimodal AI expert specializing in visual and text prompts. Consider both textual clarity and potential visual elements in your analysis.',
-      'exaone-32b': 'You are a methodical prompt evaluator with strong analytical skills. Provide structured, logical analysis with data-driven insights.',
-      'afm-4.5b': 'You are a fast, efficient prompt optimizer. Provide quick, focused analysis with high-impact improvement suggestions.',
-      'mixtral-8x7b': 'You are a creative prompt specialist with expertise in diverse domains. Provide innovative analysis with unique perspectives and creative suggestions.',
-      'dialogpt-medium': 'You are a conversational AI expert. Analyze prompts with focus on dialogue quality, engagement, and conversational flow.'
+      "llama-70b":
+        "You are an expert prompt engineer with deep expertise in large language models. Provide comprehensive, detailed analysis with sophisticated insights.",
+      "llama-8b":
+        "You are a skilled prompt analyst focused on practical improvements. Provide balanced analysis with actionable recommendations.",
+      "llama-3b":
+        "You are a helpful prompt assistant. Provide clear, straightforward analysis with simple, easy-to-understand suggestions.",
+      "llama-11b-vision":
+        "You are a multimodal AI expert specializing in visual and text prompts. Consider both textual clarity and potential visual elements in your analysis.",
+      "exaone-32b":
+        "You are a methodical prompt evaluator with strong analytical skills. Provide structured, logical analysis with data-driven insights.",
+      "afm-4.5b":
+        "You are a fast, efficient prompt optimizer. Provide quick, focused analysis with high-impact improvement suggestions.",
+      "mixtral-8x7b":
+        "You are a creative prompt specialist with expertise in diverse domains. Provide innovative analysis with unique perspectives and creative suggestions.",
+      "dialogpt-medium":
+        "You are a conversational AI expert. Analyze prompts with focus on dialogue quality, engagement, and conversational flow.",
     };
-    
-    return instructions[model] || instructions['afm-4.5b'];
+
+    return instructions[model] || instructions["afm-4.5b"];
   }
 
+  /**
+   * Parse and validate AI response, with fallback for invalid responses
+   *
+   * @private
+   * @param content - Raw response content from AI
+   * @param originalText - Original input text for fallback scoring
+   * @param model - Model used for analysis
+   * @returns AIAnalysisResult - Parsed and validated analysis result
+   *
+   * @example
+   * ```typescript
+   * // Handles various response formats:
+   * // 1. Clean JSON: {"score": {...}, "suggestions": [...]}
+   * // 2. JSON with extra text: "Here's the analysis: {...} Hope this helps!"
+   * // 3. Malformed JSON: Falls back to generateFallbackAnalysis()
+   *
+   * // Output structure:
+   * // {
+   * //   score: { clarity: 85, context: 80, format: 85, overall: 83 },
+   * //   suggestions: ["Improve clarity", "Add context"],
+   * //   improvements: ["Be more specific", "Include examples"],
+   * //   rewrites: ["Enhanced version: ...", "Alternative approach: ..."],
+   * //   tone: "professional",
+   * //   category: "general",
+   * //   confidence: 85
+   * // }
+   * ```
+   */
   private parseAnalysisResponse(
-    content: string, 
+    content: string,
     originalText: string,
-    model: ModelType = 'afm-4.5b'
-  ): Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'> {
+    model: ModelType = "afm-4.5b"
+  ): Omit<AIAnalysisResult, "processingTime" | "model" | "metadata"> {
     try {
-      console.log('🔧 Raw AI response content:', content);
-      
+      console.log("🔧 Raw AI response content:", content);
+
       // Extract JSON from response (handle cases where AI adds extra text)
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        console.error('🔧 No JSON found in AI response');
-        throw new Error('No valid JSON found in response');
+        console.error("🔧 No JSON found in AI response");
+        throw new Error("No valid JSON found in response");
       }
 
-      console.log('🔧 Extracted JSON:', jsonMatch[0]);
+      console.log("🔧 Extracted JSON:", jsonMatch[0]);
       const parsed = JSON.parse(jsonMatch[0]);
-      console.log('🔧 Parsed AI response:', parsed);
-      
+      console.log("🔧 Parsed AI response:", parsed);
+
       // Validate required fields
       this.validateAnalysisResponse(parsed);
-      
+
       // Apply content-length based scoring adjustments
-      const adjustedScore = this.adjustScoreForLength(parsed.score, originalText);
-      console.log('🔧 Adjusted score:', adjustedScore);
-      
+      const adjustedScore = this.adjustScoreForLength(
+        parsed.score,
+        originalText
+      );
+      console.log("🔧 Adjusted score:", adjustedScore);
+
       const result = {
         score: adjustedScore,
-        suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
-        improvements: Array.isArray(parsed.improvements) ? parsed.improvements : [],
+        suggestions: Array.isArray(parsed.suggestions)
+          ? parsed.suggestions
+          : [],
+        improvements: Array.isArray(parsed.improvements)
+          ? parsed.improvements
+          : [],
         rewrites: Array.isArray(parsed.rewrites) ? parsed.rewrites : [],
-        tone: parsed.tone || 'neutral',
-        category: parsed.category || 'general',
+        tone: parsed.tone || "neutral",
+        category: parsed.category || "general",
         confidence: Math.max(0, Math.min(100, parsed.confidence || 75)),
       };
-      
-      console.log('🔧 Final parsed result:', result);
-      return result;
 
+      console.log("🔧 Final parsed result:", result);
+      return result;
     } catch (error) {
-      console.error('🔧 Failed to parse AI response:', error);
-      console.log('🔧 Using fallback analysis');
-      
+      console.error("🔧 Failed to parse AI response:", error);
+      console.log("🔧 Using fallback analysis");
+
       // Return fallback analysis
       return this.generateFallbackAnalysis(originalText, model);
     }
   }
 
+  /**
+   * Validate parsed analysis response structure
+   *
+   * @private
+   * @param parsed - Parsed response object
+   * @throws {Error} When required fields are missing or invalid
+   *
+   * @example
+   * ```typescript
+   * // Validates that response contains:
+   * // - score object with clarity, context, format, overall (0-100)
+   * // - All score fields are numbers within valid range
+   * // - Required structure matches expected format
+   *
+   * // Valid score object:
+   * // {
+   * //   clarity: 85,    // 0-100
+   * //   context: 80,    // 0-100
+   * //   format: 90,     // 0-100
+   * //   overall: 85     // 0-100
+   * // }
+   * ```
+   */
   private validateAnalysisResponse(parsed: any): void {
-    if (!parsed.score || typeof parsed.score !== 'object') {
-      throw new Error('Invalid score object');
+    if (!parsed.score || typeof parsed.score !== "object") {
+      throw new Error("Invalid score object");
     }
 
-    const requiredScoreFields = ['clarity', 'context', 'format', 'overall'];
+    const requiredScoreFields = ["clarity", "context", "format", "overall"];
     for (const field of requiredScoreFields) {
-      if (typeof parsed.score[field] !== 'number' || 
-          parsed.score[field] < 0 || 
-          parsed.score[field] > 100) {
+      if (
+        typeof parsed.score[field] !== "number" ||
+        parsed.score[field] < 0 ||
+        parsed.score[field] > 100
+      ) {
         throw new Error(`Invalid score field: ${field}`);
       }
     }
   }
 
+  /**
+   * Adjust scores based on content length using configured multipliers
+   *
+   * @private
+   * @param score - Original score object
+   * @param text - Input text for length calculation
+   * @returns Adjusted score object
+   *
+   * @example
+   * ```typescript
+   * // Length-based scoring adjustments:
+   * // SHORT (0-50 chars): Score range 40-70
+   * // MEDIUM (51-200 chars): Score range 70-90
+   * // LONG (201+ chars): Score range 85-100
+   *
+   * // Original score: { clarity: 80, context: 75, format: 85, overall: 80 }
+   * // For SHORT text: { clarity: 56, context: 52, format: 59, overall: 56 }
+   * // For LONG text: { clarity: 92, context: 88, format: 95, overall: 92 }
+   * ```
+   */
   private adjustScoreForLength(score: any, text: string): any {
     const length = text.length;
     const config = SCORING_CONFIG.CONTENT_LENGTH_MULTIPLIERS;
-    
+
     let lengthCategory: keyof typeof config;
     if (length <= config.SHORT.max) {
-      lengthCategory = 'SHORT';
+      lengthCategory = "SHORT";
     } else if (length <= config.MEDIUM.max) {
-      lengthCategory = 'MEDIUM';
+      lengthCategory = "MEDIUM";
     } else {
-      lengthCategory = 'LONG';
+      lengthCategory = "LONG";
     }
-    
+
     const [minScore, maxScore] = config[lengthCategory].scoreRange;
-    
+
     // Normalize scores to the appropriate range for the content length
     const normalizeScore = (originalScore: number) => {
-      const normalizedScore = (originalScore / 100) * (maxScore - minScore) + minScore;
+      const normalizedScore =
+        (originalScore / 100) * (maxScore - minScore) + minScore;
       return Math.min(100, Math.max(0, Math.round(normalizedScore)));
     };
-    
+
     return {
       clarity: normalizeScore(score.clarity || 0),
       context: normalizeScore(score.context || 0),
@@ -460,92 +812,182 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
     };
   }
 
-  private generateFallbackAnalysis(text: string, model: ModelType = 'afm-4.5b'): Omit<AIAnalysisResult, 'processingTime' | 'model' | 'metadata'> {
+  /**
+   * Generate fallback analysis when AI service is unavailable
+   *
+   * @private
+   * @param text - Input text
+   * @param model - Model type for model-specific fallbacks
+   * @returns Fallback analysis result
+   *
+   * @example
+   * ```typescript
+   * // Generates realistic fallback data:
+   * // - Length-based scoring (short: 60, medium: 75, long: 85)
+   * // - Model-specific multipliers and suggestions
+   * // - Randomized variations for realism
+   *
+   * // llama-70b fallback:
+   * // {
+   * //   score: { clarity: 93, context: 92, format: 94, overall: 93 },
+   * //   suggestions: ["Consider implementing advanced prompt engineering..."],
+   * //   tone: "professional",
+   * //   confidence: 77
+   * // }
+   *
+   * // llama-3b fallback:
+   * // {
+   * //   score: { clarity: 80, context: 76, format: 76, overall: 77 },
+   * //   suggestions: ["Keep instructions simple and direct"],
+   * //   tone: "practical",
+   * //   confidence: 65
+   * // }
+   * ```
+   */
+  private generateFallbackAnalysis(
+    text: string,
+    model: ModelType = "afm-4.5b"
+  ): Omit<AIAnalysisResult, "processingTime" | "model" | "metadata"> {
     const length = text.length;
     const baseScore = length < 50 ? 60 : length < 200 ? 75 : 85;
-    
+
     // Model-specific scoring variations
     const modelMultipliers = {
-      'llama-70b': { clarity: 1.1, context: 1.15, format: 1.1, suggestions: 4 },
-      'llama-8b': { clarity: 1.05, context: 1.1, format: 1.05, suggestions: 3 },
-      'llama-3b': { clarity: 0.95, context: 0.95, format: 0.9, suggestions: 2 },
-      'llama-11b-vision': { clarity: 1.0, context: 1.2, format: 1.1, suggestions: 3 },
-      'exaone-32b': { clarity: 1.08, context: 1.05, format: 1.12, suggestions: 4 },
-      'afm-4.5b': { clarity: 0.9, context: 0.85, format: 0.9, suggestions: 2 },
-      'mixtral-8x7b': { clarity: 1.12, context: 1.1, format: 1.05, suggestions: 5 },
-      'dialogpt-medium': { clarity: 0.95, context: 1.0, format: 0.85, suggestions: 3 }
+      "llama-70b": { clarity: 1.1, context: 1.15, format: 1.1, suggestions: 4 },
+      "llama-8b": { clarity: 1.05, context: 1.1, format: 1.05, suggestions: 3 },
+      "llama-3b": { clarity: 0.95, context: 0.95, format: 0.9, suggestions: 2 },
+      "llama-11b-vision": {
+        clarity: 1.0,
+        context: 1.2,
+        format: 1.1,
+        suggestions: 3,
+      },
+      "exaone-32b": {
+        clarity: 1.08,
+        context: 1.05,
+        format: 1.12,
+        suggestions: 4,
+      },
+      "afm-4.5b": { clarity: 0.9, context: 0.85, format: 0.9, suggestions: 2 },
+      "mixtral-8x7b": {
+        clarity: 1.12,
+        context: 1.1,
+        format: 1.05,
+        suggestions: 5,
+      },
+      "dialogpt-medium": {
+        clarity: 0.95,
+        context: 1.0,
+        format: 0.85,
+        suggestions: 3,
+      },
     };
 
-    const multiplier = modelMultipliers[model] || modelMultipliers['afm-4.5b'];
-    
+    const multiplier = modelMultipliers[model] || modelMultipliers["afm-4.5b"];
+
     // Model-specific suggestions
     const modelSuggestions = {
-      'llama-70b': [
-        'Consider implementing advanced prompt engineering techniques for optimal results',
-        'Leverage sophisticated context framing to enhance AI comprehension',
-        'Incorporate domain-specific terminology for precision',
-        'Structure your request with hierarchical information layers'
+      "llama-70b": [
+        "Consider implementing advanced prompt engineering techniques for optimal results",
+        "Leverage sophisticated context framing to enhance AI comprehension",
+        "Incorporate domain-specific terminology for precision",
+        "Structure your request with hierarchical information layers",
       ],
-      'llama-8b': [
-        'Balance specificity with clarity for effective communication',
-        'Provide structured context to guide AI reasoning',
-        'Use practical examples to illustrate your requirements'
+      "llama-8b": [
+        "Balance specificity with clarity for effective communication",
+        "Provide structured context to guide AI reasoning",
+        "Use practical examples to illustrate your requirements",
       ],
-      'llama-3b': [
-        'Keep instructions simple and direct',
-        'Add basic context to help understanding',
-        'Use clear, everyday language'
+      "llama-3b": [
+        "Keep instructions simple and direct",
+        "Add basic context to help understanding",
+        "Use clear, everyday language",
       ],
-      'llama-11b-vision': [
-        'Consider visual elements that could enhance your prompt',
-        'Structure information with visual hierarchy in mind',
-        'Include descriptions of visual context when relevant'
+      "llama-11b-vision": [
+        "Consider visual elements that could enhance your prompt",
+        "Structure information with visual hierarchy in mind",
+        "Include descriptions of visual context when relevant",
       ],
-      'exaone-32b': [
-        'Organize your prompt with logical structure and clear sequence',
-        'Provide systematic context with methodical approach',
-        'Use analytical frameworks to structure requirements',
-        'Include measurable criteria for evaluation'
+      "exaone-32b": [
+        "Organize your prompt with logical structure and clear sequence",
+        "Provide systematic context with methodical approach",
+        "Use analytical frameworks to structure requirements",
+        "Include measurable criteria for evaluation",
       ],
-      'afm-4.5b': [
-        'Focus on essential information for quick processing',
-        'Use concise, action-oriented language'
+      "afm-4.5b": [
+        "Focus on essential information for quick processing",
+        "Use concise, action-oriented language",
       ],
-      'mixtral-8x7b': [
-        'Explore creative approaches to prompt formulation',
-        'Consider multiple perspectives and domain intersections',
-        'Leverage diverse expertise areas in your request',
-        'Think outside conventional prompting patterns',
-        'Incorporate innovative framing techniques'
+      "mixtral-8x7b": [
+        "Explore creative approaches to prompt formulation",
+        "Consider multiple perspectives and domain intersections",
+        "Leverage diverse expertise areas in your request",
+        "Think outside conventional prompting patterns",
+        "Incorporate innovative framing techniques",
       ],
-      'dialogpt-medium': [
-        'Frame your prompt as a natural conversation',
-        'Consider the conversational flow and engagement',
-        'Use dialogue-friendly language and tone'
-      ]
+      "dialogpt-medium": [
+        "Frame your prompt as a natural conversation",
+        "Consider the conversational flow and engagement",
+        "Use dialogue-friendly language and tone",
+      ],
     };
-    
-    const suggestions = modelSuggestions[model] || modelSuggestions['afm-4.5b'];
-    
+
+    const suggestions = modelSuggestions[model] || modelSuggestions["afm-4.5b"];
+
     return {
       score: {
-        clarity: Math.min(100, Math.round(baseScore * multiplier.clarity + Math.random() * 10)),
-        context: Math.min(100, Math.round(baseScore * multiplier.context + Math.random() * 10)),
-        format: Math.min(100, Math.round(baseScore * multiplier.format + Math.random() * 10)),
-        overall: Math.min(100, Math.round(baseScore * ((multiplier.clarity + multiplier.context + multiplier.format) / 3) + Math.random() * 10)),
+        clarity: Math.min(
+          100,
+          Math.round(baseScore * multiplier.clarity + Math.random() * 10)
+        ),
+        context: Math.min(
+          100,
+          Math.round(baseScore * multiplier.context + Math.random() * 10)
+        ),
+        format: Math.min(
+          100,
+          Math.round(baseScore * multiplier.format + Math.random() * 10)
+        ),
+        overall: Math.min(
+          100,
+          Math.round(
+            baseScore *
+              ((multiplier.clarity + multiplier.context + multiplier.format) /
+                3) +
+              Math.random() * 10
+          )
+        ),
       },
       suggestions: suggestions.slice(0, multiplier.suggestions),
       improvements: [
-        'Be more specific about expected results',
-        'Include relevant background information',
-        'Add examples of desired output',
+        "Be more specific about expected results",
+        "Include relevant background information",
+        "Add examples of desired output",
       ].slice(0, Math.max(2, multiplier.suggestions - 1)),
       rewrites: [
-        `Enhanced prompt: ${text.substring(0, 80)}${text.length > 80 ? '...' : ''} - Please provide detailed analysis with specific examples.`,
-        `${model.includes('dialog') ? 'Conversational approach: ' : model.includes('vision') ? 'Multimodal request: ' : 'Optimized version: '}${text.substring(0, 60)}${text.length > 60 ? '...' : ''}`
+        `Enhanced prompt: ${text.substring(0, 80)}${
+          text.length > 80 ? "..." : ""
+        } - Please provide detailed analysis with specific examples.`,
+        `${
+          model.includes("dialog")
+            ? "Conversational approach: "
+            : model.includes("vision")
+            ? "Multimodal request: "
+            : "Optimized version: "
+        }${text.substring(0, 60)}${text.length > 60 ? "..." : ""}`,
       ],
-      tone: model.includes('dialog') ? 'conversational' : model.includes('70b') ? 'professional' : model.includes('mixtral') ? 'creative' : 'practical',
-      category: model.includes('vision') ? 'multimodal' : model.includes('dialog') ? 'conversational' : 'general',
+      tone: model.includes("dialog")
+        ? "conversational"
+        : model.includes("70b")
+        ? "professional"
+        : model.includes("mixtral")
+        ? "creative"
+        : "practical",
+      category: model.includes("vision")
+        ? "multimodal"
+        : model.includes("dialog")
+        ? "conversational"
+        : "general",
       confidence: Math.min(100, Math.round(70 * multiplier.clarity)),
     };
   }
@@ -562,16 +1004,16 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
 
   private getModelKey(model: ModelType): keyof typeof AI_MODELS {
     const keyMap: Record<ModelType, keyof typeof AI_MODELS> = {
-      'llama-70b': 'LLAMA_70B',
-      'exaone-32b': 'EXAONE_32B',
-      'afm-4.5b': 'AFM_4_5B',
-      'llama-3b': 'LLAMA_3B',
-      'llama-8b': 'LLAMA_8B',
-      'llama-11b-vision': 'LLAMA_11B_VISION',
-      'mixtral-8x7b': 'MIXTRAL_8X7B',
-      'dialogpt-medium': 'DIALOGPT_MEDIUM'
+      "llama-70b": "LLAMA_70B",
+      "exaone-32b": "EXAONE_32B",
+      "afm-4.5b": "AFM_4_5B",
+      "llama-3b": "LLAMA_3B",
+      "llama-8b": "LLAMA_8B",
+      "llama-11b-vision": "LLAMA_11B_VISION",
+      "mixtral-8x7b": "MIXTRAL_8X7B",
+      "dialogpt-medium": "DIALOGPT_MEDIUM",
     };
-    return keyMap[model] || 'AFM_4_5B';
+    return keyMap[model] || "AFM_4_5B";
   }
 
   /**
@@ -579,20 +1021,23 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
    */
   private validateConfiguration(): void {
     if (!this.config.apiKey) {
-      throw new Error('AI service API key is required');
+      throw new Error("AI service API key is required");
     }
   }
 
   private validateRequest(request: AnalysisRequest): void {
     if (!request.text || request.text.trim().length === 0) {
-      throw new Error('Text is required for analysis');
+      throw new Error("Text is required for analysis");
     }
 
     if (request.text.length > 10000) {
-      throw new Error('Text too long for analysis (max 10,000 characters)');
+      throw new Error("Text too long for analysis (max 10,000 characters)");
     }
 
-    if (request.model && !Object.values(AI_MODELS).some(m => m.id === request.model)) {
+    if (
+      request.model &&
+      !Object.values(AI_MODELS).some((m) => m.id === request.model)
+    ) {
       throw new Error(`Invalid model: ${request.model}`);
     }
   }
@@ -627,7 +1072,10 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
   }
 
   private recordFailure(model: ModelType): void {
-    const state = this.circuitBreaker.get(model) || { failures: 0, lastFailure: 0 };
+    const state = this.circuitBreaker.get(model) || {
+      failures: 0,
+      lastFailure: 0,
+    };
     state.failures += 1;
     state.lastFailure = Date.now();
     this.circuitBreaker.set(model, state);
@@ -647,25 +1095,29 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private countWords(text: string): number {
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    return text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
   }
 
   private countSentences(text: string): number {
-    return text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0).length;
+    return text.split(/[.!?]+/).filter((sentence) => sentence.trim().length > 0)
+      .length;
   }
 
   private calculateReadabilityScore(text: string): number {
     const words = this.countWords(text);
     const sentences = this.countSentences(text);
-    
+
     if (sentences === 0) return 0;
-    
+
     const avgWordsPerSentence = words / sentences;
-    
+
     // Simple readability score based on average sentence length
     if (avgWordsPerSentence <= 15) return 90;
     if (avgWordsPerSentence <= 20) return 75;
@@ -674,10 +1126,13 @@ ${options.detailedAnalysis ? '\n- Provide detailed explanations for each score' 
   }
 
   private handleError(error: unknown): ApiResponse<never> {
-    const errorMessage = error instanceof Error ? error.message : ERROR_MESSAGES.AI.ANALYSIS_FAILED;
-    
-    console.error('AI Service Error:', error);
-    
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : ERROR_MESSAGES.AI.ANALYSIS_FAILED;
+
+    console.error("AI Service Error:", error);
+
     return {
       success: false,
       error: errorMessage,
@@ -692,49 +1147,60 @@ export const aiAnalysisService = new AIAnalysisService();
 /**
  * @deprecated Use aiAnalysisService.analyzePrompt instead
  */
-export async function analyzePrompt(text: string, model: ModelType = 'llama-70b'): Promise<AIAnalysisResult> {
+export async function analyzePrompt(
+  text: string,
+  model: ModelType = "llama-70b"
+): Promise<AIAnalysisResult> {
   // Check if API key is available
   const apiKey = process.env.TOGETHER_API_KEY;
-  
-  if (!apiKey || apiKey === 'your_together_ai_api_key_here') {
-    console.warn('⚠️ TOGETHER_API_KEY not configured. Using mock AI response for development.');
-    console.warn('   Set TOGETHER_API_KEY environment variable for real AI functionality.');
-    console.warn('   Get your API key from: https://api.together.ai/');
-    
+
+  if (!apiKey || apiKey === "your_together_ai_api_key_here") {
+    console.warn(
+      "⚠️ TOGETHER_API_KEY not configured. Using mock AI response for development."
+    );
+    console.warn(
+      "   Set TOGETHER_API_KEY environment variable for real AI functionality."
+    );
+    console.warn("   Get your API key from: https://api.together.ai/");
+
     // Return mock response for development
     const length = text.length;
     const baseScore = length < 50 ? 60 : length < 200 ? 75 : 85;
-    
+
     return {
       score: {
         clarity: Math.round(baseScore + Math.random() * 15),
-        context: Math.round(baseScore + Math.random() * 15), 
+        context: Math.round(baseScore + Math.random() * 15),
         format: Math.round(baseScore + Math.random() * 15),
         overall: Math.round(baseScore + Math.random() * 15),
       },
       suggestions: [
-        'Consider adding more specific details to improve clarity',
-        'Provide additional context for better AI understanding',
-        'Define the desired output format more clearly',
+        "Consider adding more specific details to improve clarity",
+        "Provide additional context for better AI understanding",
+        "Define the desired output format more clearly",
       ],
       improvements: [
-        'Be more specific about expected results',
-        'Include relevant background information',
-        'Add examples of desired output',
+        "Be more specific about expected results",
+        "Include relevant background information",
+        "Add examples of desired output",
       ],
       rewrites: [
-        `Please provide a detailed analysis of the following topic: ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}`,
+        `Please provide a detailed analysis of the following topic: ${text.substring(
+          0,
+          100
+        )}${text.length > 100 ? "..." : ""}`,
         `Analyze and explain: ${text}`,
       ],
-      tone: 'professional',
-      category: 'general',
+      tone: "professional",
+      category: "general",
       confidence: 75,
       processingTime: Math.round(Math.random() * 500 + 200),
       model,
       metadata: {
         wordCount: text.trim().split(/\s+/).length,
         characterCount: text.length,
-        sentenceCount: text.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
+        sentenceCount: text.split(/[.!?]+/).filter((s) => s.trim().length > 0)
+          .length,
         readabilityScore: Math.round(Math.random() * 30 + 70),
       },
     };
@@ -748,40 +1214,43 @@ export async function analyzePrompt(text: string, model: ModelType = 'llama-70b'
     }
     return result.data!;
   } catch (error) {
-    console.error('AI service error, falling back to mock response:', error);
-    
+    console.error("AI service error, falling back to mock response:", error);
+
     // Fallback to mock response on error
     const length = text.length;
     const baseScore = length < 50 ? 60 : length < 200 ? 75 : 85;
-    
+
     return {
       score: {
         clarity: Math.round(baseScore + Math.random() * 15),
-        context: Math.round(baseScore + Math.random() * 15), 
+        context: Math.round(baseScore + Math.random() * 15),
         format: Math.round(baseScore + Math.random() * 15),
         overall: Math.round(baseScore + Math.random() * 15),
       },
       suggestions: [
-        'Service temporarily unavailable - using mock analysis',
-        'Consider adding more specific details to improve clarity',
-        'Provide additional context for better AI understanding',
+        "Service temporarily unavailable - using mock analysis",
+        "Consider adding more specific details to improve clarity",
+        "Provide additional context for better AI understanding",
       ],
       improvements: [
-        'Be more specific about expected results',
-        'Include relevant background information',
+        "Be more specific about expected results",
+        "Include relevant background information",
       ],
       rewrites: [
-        `Please provide a detailed analysis of: ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}`,
+        `Please provide a detailed analysis of: ${text.substring(0, 100)}${
+          text.length > 100 ? "..." : ""
+        }`,
       ],
-      tone: 'professional',
-      category: 'general',
+      tone: "professional",
+      category: "general",
       confidence: 65,
       processingTime: Math.round(Math.random() * 500 + 200),
       model,
       metadata: {
         wordCount: text.trim().split(/\s+/).length,
         characterCount: text.length,
-        sentenceCount: text.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
+        sentenceCount: text.split(/[.!?]+/).filter((s) => s.trim().length > 0)
+          .length,
         readabilityScore: Math.round(Math.random() * 30 + 70),
       },
     };
@@ -797,4 +1266,4 @@ export async function getAvailableModels() {
 }
 
 // Re-export types for backward compatibility
-export type { ModelType, AIAnalysisResult }; 
+export type { ModelType, AIAnalysisResult };
