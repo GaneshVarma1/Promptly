@@ -8,17 +8,13 @@ import PromptRewrites from "./PromptRewrites";
 import PromptScore from "./PromptScore";
 import { Wand2, Copy, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from '@/lib/ai-client';
+import { useUser } from '@clerk/nextjs';
 
-/**
- * Props for the PromptEditor component.
- */
 export interface PromptEditorProps {
-  initialPrompt?: string;
+  documentId: string;
 }
 
-/**
- * Scoring structure for prompt analysis.
- */
 interface Score {
   clarity: number;
   context: number;
@@ -26,12 +22,9 @@ interface Score {
   overall: number;
 }
 
-/**
- * Main prompt editor with tone, suggestions, rewrites, and scoring.
- * Simulates AI analysis and provides UX for prompt crafting.
- */
-const PromptEditor: FC<PromptEditorProps> = ({ initialPrompt = "" }) => {
-  const [prompt, setPrompt] = useState(initialPrompt);
+const PromptEditor: FC<PromptEditorProps> = ({ documentId }) => {
+  const { user } = useUser();
+  const [prompt, setPrompt] = useState("");
   const [tone, setTone] = useState<"friendly" | "formal" | "creative">("friendly");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -40,10 +33,20 @@ const PromptEditor: FC<PromptEditorProps> = ({ initialPrompt = "" }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
-  // Initialize with initial prompt
+  // Load document from Supabase on mount
   useEffect(() => {
-    if (initialPrompt) setPrompt(initialPrompt);
-  }, [initialPrompt]);
+    const fetchDoc = async () => {
+      if (!documentId || !user?.id) return;
+      const { data, error } = await supabase
+        .from('documents')
+        .select('content')
+        .eq('id', documentId)
+        .eq('user_id', user.id)
+        .single();
+      if (data?.content) setPrompt(data.content);
+    };
+    fetchDoc();
+  }, [documentId, user?.id]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -93,12 +96,23 @@ const PromptEditor: FC<PromptEditorProps> = ({ initialPrompt = "" }) => {
     return () => clearTimeout(timer);
   }, [prompt]);
 
-  // Memoized prompt change handler
+  // Save prompt to Supabase on change (debounced)
+  useEffect(() => {
+    if (!documentId || !user?.id) return;
+    const timeout = setTimeout(async () => {
+      await supabase
+        .from('documents')
+        .update({ content: prompt, lastModified: new Date().toISOString() })
+        .eq('id', documentId)
+        .eq('user_id', user.id);
+    }, 800);
+    return () => clearTimeout(timeout);
+  }, [prompt, documentId, user?.id]);
+
   const handlePromptChange = useCallback((value: string) => {
     setPrompt(value);
   }, []);
 
-  // Memoized copy handler
   const copyPrompt = useCallback(() => {
     navigator.clipboard.writeText(prompt);
     toast({
@@ -107,7 +121,6 @@ const PromptEditor: FC<PromptEditorProps> = ({ initialPrompt = "" }) => {
     });
   }, [prompt, toast]);
 
-  // Memoized share handler
   const sharePrompt = useCallback(() => {
     const shareData = {
       title: "My AI Prompt",
@@ -167,8 +180,7 @@ const PromptEditor: FC<PromptEditorProps> = ({ initialPrompt = "" }) => {
         </Card>
         <PromptRewrites
           rewrites={rewrites}
-          onSelectRewrite={setPrompt}
-          tone={tone}
+          onUseRewrite={setPrompt}
           isLoading={isAnalyzing}
         />
       </div>

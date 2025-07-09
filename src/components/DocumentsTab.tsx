@@ -17,58 +17,60 @@ interface DocumentsTabProps {
 export function DocumentsTab({ onTabChange }: DocumentsTabProps = {}) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const { documents, setStatus, deleteDocument, createDocument } = useDocuments();
-  const counts = useDocumentCounts();
+  const { documents, setStatus, deleteDocument, createDocument, loading, error } = useDocuments();
+  const { documents: docCount, saved, trash, loading: countsLoading, error: countsError } = useDocumentCounts();
 
   const filteredDocuments = useMemo(() => {
-    const activeDocuments = documents.filter(doc => {
-      const status = localStorage.getItem(`status-${doc.id}`) || 'active';
-      return status === 'active' || status === 'saved';
-    });
-    
+    const activeDocuments = documents.filter(doc => doc.status === 'active' || doc.status === 'saved');
     if (!searchQuery.trim()) return activeDocuments;
-    
-    return activeDocuments.filter(doc => 
+    return activeDocuments.filter(doc =>
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [documents, searchQuery]);
 
-  const handleNewDocument = () => {
-    const newId = createDocument();
-    console.log(`About to navigate to prompt ${newId}`);
-    
-    // Verify the document exists before navigating
-    const verifyDocument = () => {
-      const exists = localStorage.getItem(`document-${newId}`) !== null;
-      console.log(`Prompt ${newId} exists: ${exists}`);
-      
-      if (exists) {
-        router.push(`/results?id=${newId}`);
-      } else {
-        console.error(`Prompt ${newId} was not created properly, retrying...`);
-        // Try creating again
-        localStorage.setItem(`document-${newId}`, '');
-        setTimeout(() => router.push(`/results?id=${newId}`), 100);
-      }
-    };
-    
-    // Small delay to ensure the document is properly created before navigation
-    setTimeout(verifyDocument, 50);
+  const handleNewDocument = async () => {
+    const newId = await createDocument();
+    if (newId) {
+      router.push(`/results?id=${newId}`);
+    }
   };
 
   const getIsSaved = (id: string) => {
-    return localStorage.getItem(`status-${id}`) === 'saved';
+    const doc = documents.find(d => d.id === id);
+    return doc?.status === 'saved';
   };
 
-  const handleToggleSave = (id: string) => {
-    const currentStatus = localStorage.getItem(`status-${id}`) || 'active';
-    setStatus(id, currentStatus === 'saved' ? 'active' : 'saved');
+  const handleToggleSave = async (id: string) => {
+    const doc = documents.find(d => d.id === id);
+    if (doc) {
+      await setStatus(id, doc.status === 'saved' ? 'active' : 'saved');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    await setStatus(id, 'trash');
   };
 
   const handleOpen = (id: string) => {
     router.push(`/results?id=${id}`);
   };
+
+  if (loading || countsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300 dark:border-gray-600"></div>
+      </div>
+    );
+  }
+
+  if (error || countsError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error || countsError}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -103,7 +105,7 @@ export function DocumentsTab({ onTabChange }: DocumentsTabProps = {}) {
               <FileTextIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{counts.documents + counts.saved}</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{docCount + saved}</div>
               <div className="text-sm text-gray-500 dark:text-zinc-400">Total Prompts</div>
             </div>
           </div>
@@ -115,7 +117,7 @@ export function DocumentsTab({ onTabChange }: DocumentsTabProps = {}) {
               <StarIcon className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{counts.saved}</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{saved}</div>
               <div className="text-sm text-gray-500 dark:text-zinc-400">Saved</div>
             </div>
           </div>
@@ -127,7 +129,7 @@ export function DocumentsTab({ onTabChange }: DocumentsTabProps = {}) {
               <ClockIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{counts.trash}</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{trash}</div>
               <div className="text-sm text-gray-500 dark:text-zinc-400">Recent</div>
             </div>
           </div>
@@ -172,7 +174,7 @@ export function DocumentsTab({ onTabChange }: DocumentsTabProps = {}) {
         <DocumentGrid 
           documents={filteredDocuments}
           getIsSaved={getIsSaved}
-          onDelete={deleteDocument}
+          onDelete={handleDelete}
           onOpen={handleOpen}
           onToggleSave={handleToggleSave}
         />

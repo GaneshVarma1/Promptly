@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { PROMPT_GALLERY_TEMPLATES } from "@/constants";
+import { useDocuments } from '@/hooks/use-documents';
+import { useUser } from '@clerk/nextjs';
 
 interface Template {
   id: string;
@@ -104,6 +106,8 @@ export default function PromptGalleryTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+  const { createDocument, loading, error } = useDocuments();
+  const { isSignedIn } = useUser();
 
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = 
@@ -117,18 +121,15 @@ export default function PromptGalleryTab() {
     return matchesSearch && matchesCategory && matchesDifficulty;
   });
 
-  const handleUseTemplate = (template: Template) => {
-    // Create new document with template content
-    const newId = `doc-${Date.now()}`;
-    localStorage.setItem(`document-${newId}`, template.content);
-    localStorage.setItem(`title-${newId}`, template.title);
-    
-    // Trigger documents update
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('documents-updated'));
+  const handleUseTemplate = async (template: Template) => {
+    if (!isSignedIn) {
+      // Optionally show a sign-in modal or redirect
+      return;
     }
-    
-    router.push(`/results?id=${newId}`);
+    const newId = await createDocument(template.title, template.content);
+    if (newId) {
+      router.push(`/results?id=${newId}`);
+    }
   };
 
   const handleCopyTemplate = (content: string) => {

@@ -10,15 +10,17 @@ import PromptSuggestions from "@/components/PromptSuggestions";
 import PromptRewrites from "@/components/PromptRewrites";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Brain, TrendingUp, Lightbulb } from "lucide-react";
+import { supabase } from '@/lib/ai-client';
 
 export default function ResultsPage() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   const params = useParams();
   const router = useRouter();
   
   // Simple state management
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [score, setScore] = useState<PromptScoreValue>({ clarity: 0, context: 0, format: 0, overall: 0 });
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [rewrites, setRewrites] = useState<string[]>([]);
@@ -40,28 +42,55 @@ export default function ResultsPage() {
     }
   }, [isLoaded, isSignedIn, router]);
 
-  // Load document content on mount
+  // Load document content from Supabase
   useEffect(() => {
-    if (!documentId) return;
-
-    try {
-      const savedContent = localStorage.getItem(`document-${documentId}`) || '';
-      setContent(savedContent);
-      setIsLoading(false);
-      console.log('📄 Loaded document:', documentId);
-    } catch (error) {
-      console.error("Error loading document:", error);
-      setIsLoading(false);
+    const fetchDocument = async () => {
+      if (!documentId || !user?.id) return;
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { data, error } = await supabase
+          .from('documents')
+          .select('content')
+          .eq('id', documentId)
+          .eq('user_id', user.id)
+          .single();
+        if (error) throw error;
+        setContent(data?.content || '');
+      } catch (err: any) {
+        setError(err.message || 'Failed to load document');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (isLoaded && isSignedIn) {
+      fetchDocument();
     }
-  }, [documentId]);
+  }, [documentId, user?.id, isLoaded, isSignedIn]);
+
+  // Save content to Supabase on change (debounced)
+  useEffect(() => {
+    if (!documentId || !user?.id) return;
+    const timeoutId = setTimeout(async () => {
+      console.log('Attempting to update document:', { documentId, userId: user.id, content });
+      const { error, data } = await supabase
+        .from('documents')
+        .update({ content, lastModified: new Date().toISOString() })
+        .eq('id', documentId)
+        .eq('user_id', user.id)
+        .select();
+      if (error) {
+        console.error('Failed to save document:', error.message);
+      } else {
+        console.log('Save successful:', data);
+      }
+    }, 800);
+    return () => clearTimeout(timeoutId);
+  }, [content, documentId, user?.id]);
 
   // Auto-save content changes
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
-    if (documentId) {
-      localStorage.setItem(`document-${documentId}`, newContent);
-      console.log('💾 Auto-saved');
-    }
   };
 
   // Analyze content with debounce
@@ -140,6 +169,14 @@ export default function ResultsPage() {
     return (
       <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
       </div>
     );
   }

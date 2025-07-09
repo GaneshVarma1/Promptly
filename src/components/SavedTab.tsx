@@ -10,34 +10,52 @@ import { useDocuments } from '@/hooks/use-documents';
 export function SavedTab() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const { documents, setStatus, deleteDocument } = useDocuments();
+  const { documents, setStatus, deleteDocument, loading, error } = useDocuments();
 
   const savedDocuments = useMemo(() => {
-    const saved = documents.filter(doc => {
-      const status = localStorage.getItem(`status-${doc.id}`);
-      return status === 'saved';
-    });
-    
+    const saved = documents.filter(doc => doc.status === 'saved');
     if (!searchQuery.trim()) return saved;
-    
-    return saved.filter(doc => 
+    return saved.filter(doc =>
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [documents, searchQuery]);
 
   const getIsSaved = (id: string) => {
-    return localStorage.getItem(`status-${id}`) === 'saved';
+    const doc = documents.find(d => d.id === id);
+    return doc?.status === 'saved';
   };
 
-  const handleToggleSave = (id: string) => {
-    const currentStatus = localStorage.getItem(`status-${id}`) || 'active';
-    setStatus(id, currentStatus === 'saved' ? 'active' : 'saved');
+  const handleToggleSave = async (id: string) => {
+    const doc = documents.find(d => d.id === id);
+    if (doc) {
+      await setStatus(id, doc.status === 'saved' ? 'active' : 'saved');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    await setStatus(id, 'trash');
   };
 
   const handleOpen = (id: string) => {
     router.push(`/results?id=${id}`);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300 dark:border-gray-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -83,7 +101,7 @@ export function SavedTab() {
         <DocumentGrid 
           documents={savedDocuments}
           getIsSaved={getIsSaved}
-          onDelete={deleteDocument}
+          onDelete={handleDelete}
           onOpen={handleOpen}
           onToggleSave={handleToggleSave}
         />

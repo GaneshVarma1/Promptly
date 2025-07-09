@@ -1,209 +1,118 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { supabase } from '@/lib/ai-client';
 
 export type DocumentStatus = 'active' | 'saved' | 'trash';
 
 export interface Document {
-  id: string; // will be a number as string, e.g. '1', '2', ...
+  id: string;
   title: string;
   content: string;
   lastModified: string;
-  score?: number;
-}
-
-function generateNextDocumentId(): string {
-  // Find the highest numeric id and increment
-  let maxId = 0;
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('document-')) {
-      const id = key.replace('document-', '');
-      const num = parseInt(id, 10);
-      if (!isNaN(num) && num > maxId) {
-        maxId = num;
-      }
-    }
-  }
-  return String(maxId + 1);
-}
-
-function getStoredScore(documentId: string, content: string): number {
-  // Try to get the real AI score first
-  const storedScore = localStorage.getItem(`score-${documentId}`);
-  if (storedScore) {
-    const score = parseInt(storedScore, 10);
-    if (!isNaN(score) && score >= 0 && score <= 100) {
-      return score;
-    }
-  }
-  
-  // Fall back to content-based estimation for documents that haven't been analyzed yet
-  if (!content || content.length < 10) return 0; // Show 0 for empty/very short content
-  if (content.length < 50) return Math.floor(Math.random() * 20) + 30; // 30-49 for short content
-  if (content.length < 200) return Math.floor(Math.random() * 25) + 50; // 50-74 for medium content
-  return Math.floor(Math.random() * 25) + 60; // 60-84 for longer content (encourage analysis)
+  status: DocumentStatus;
+  user_id: string;
+  [key: string]: any;
 }
 
 export function useDocuments() {
+  const { user, isLoaded } = useUser();
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load and clean documents
-  const loadDocuments = useCallback(() => {
-    // Migration: convert 'doc-' keys to 'document-' keys
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('doc-') && !key.startsWith('document-')) {
-        const value = localStorage.getItem(key);
-        if (value && value.trim() !== '') {
-          const newKey = key.replace(/^doc-/, 'document-');
-          localStorage.setItem(newKey, value);
-          // Migrate status if exists
-          const status = localStorage.getItem(`status-${key}`);
-          if (status) {
-            localStorage.setItem(`status-${newKey.replace('document-', '')}`, status);
-            localStorage.removeItem(`status-${key}`);
-          }
-        }
-        localStorage.removeItem(key);
-      }
+  const loadDocuments = useCallback(async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setDocuments(data || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load documents');
+    } finally {
+      setLoading(false);
     }
-    const loadedDocs: Document[] = [];
-    let cleaned = false;
-    const validIds = new Set<string>();
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('document-')) {
-        const documentId = key.replace('document-', '');
-        const value = localStorage.getItem(key);
-        if (value !== null) {
-          validIds.add(documentId);
-          
-          // Check for custom title first, then fall back to content-based title
-          const customTitle = localStorage.getItem(`title-${documentId}`);
-          let title: string;
-          
-          if (customTitle) {
-            title = customTitle;
-          } else if (value.trim()) {
-            title = value.substring(0, 50) || 'Untitled Document';
-          } else {
-            title = 'New Document';
-          }
-          
-          loadedDocs.push({
-            id: documentId,
-            title: title,
-            content: value,
-            lastModified: new Date().toISOString(),
-            score: getStoredScore(documentId, value),
-          });
-        } else {
-          localStorage.removeItem(key);
-          cleaned = true;
-        }
-      }
-    }
-    // Clean up orphaned status, score, and title keys
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (key.startsWith('status-') || key.startsWith('score-') || key.startsWith('title-'))) {
-        const documentId = key.replace(/^(status-|score-|title-)/, '');
-        if (!validIds.has(documentId)) {
-          localStorage.removeItem(key);
-          cleaned = true;
-        }
-      }
-    }
-    setDocuments(loadedDocs);
-    if (cleaned) dispatchDocumentsUpdated();
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
-    loadDocuments();
-    const handleUpdate = () => loadDocuments();
-    window.addEventListener('documents-updated', handleUpdate);
-    return () => window.removeEventListener('documents-updated', handleUpdate);
-  }, [loadDocuments]);
-
-  function dispatchDocumentsUpdated() {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('documents-updated'));
+    if (isLoaded && user?.id) {
+      loadDocuments();
     }
-  }
+  }, [isLoaded, user?.id, loadDocuments]);
 
-  function createDocument() {
-    const newId = generateNextDocumentId();
-    localStorage.setItem(`document-${newId}`, '');
-    console.log(`Created document with ID: ${newId}, content:`, localStorage.getItem(`document-${newId}`));
-    dispatchDocumentsUpdated();
-    loadDocuments();
-    return newId;
-  }
-
-  function deleteDocument(id: string) {
-    localStorage.setItem(`status-${id}`, 'trash');
-    dispatchDocumentsUpdated();
-    loadDocuments();
-  }
-
-  function deleteAllSaved() {
-    const idsToDelete: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('status-') && localStorage.getItem(key) === 'saved') {
-        const id = key.replace('status-', '');
-        idsToDelete.push(id);
-      }
+  const createDocument = async (title = 'Untitled', content = '') => {
+    if (!user?.id) return null;
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .insert([{ title, content, status: 'active', user_id: user.id, lastModified: new Date().toISOString() }])
+        .select()
+        .single();
+      if (error) throw error;
+      setDocuments((prev) => [data, ...prev]);
+      return data.id;
+    } catch (err: any) {
+      setError(err.message || 'Failed to create document');
+      return null;
+    } finally {
+      setLoading(false);
     }
-    idsToDelete.forEach((id) => {
-      localStorage.removeItem(`document-${id}`);
-      localStorage.removeItem(`status-${id}`);
-      localStorage.removeItem(`score-${id}`); // Clean up scores too
-      localStorage.removeItem(`title-${id}`); // Clean up titles too
-    });
-    dispatchDocumentsUpdated();
-    loadDocuments();
-  }
+  };
 
-  function setStatus(id: string, status: DocumentStatus) {
-    localStorage.setItem(`status-${id}`, status);
-    dispatchDocumentsUpdated();
-    loadDocuments();
-  }
-
-  function getFilteredDocuments(tab: 'documents' | 'saved' | 'trash' | 'prompt-gallery', search: string = ''): Document[] {
-    return documents.filter(doc => {
-      const status = localStorage.getItem(`status-${doc.id}`) || 'active';
-      if (tab === 'documents') return status === 'active' || status === 'saved';
-      if (tab === 'saved') return status === 'saved';
-      if (tab === 'trash') return status === 'trash';
-      return false;
-    }).filter(doc => {
-      if (!search) return true;
-      return doc.title.toLowerCase().includes(search.toLowerCase()) || doc.content.toLowerCase().includes(search.toLowerCase());
-    });
-  }
-
-  function deleteAllDocuments() {
-    const keysToDelete: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (key.startsWith('document-') || key.startsWith('status-') || key.startsWith('score-') || key.startsWith('title-') || key.startsWith('doc-'))) {
-        keysToDelete.push(key);
-      }
+  const deleteDocument = async (id: string) => {
+    if (!user?.id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+      if (error) throw error;
+      setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete document');
+    } finally {
+      setLoading(false);
     }
-    keysToDelete.forEach((key) => localStorage.removeItem(key));
-    dispatchDocumentsUpdated();
-    loadDocuments();
-  }
+  };
+
+  const setStatus = async (id: string, status: DocumentStatus) => {
+    if (!user?.id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .update({ status, lastModified: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      setDocuments((prev) => prev.map((doc) => (doc.id === id ? { ...doc, status } : doc)));
+    } catch (err: any) {
+      setError(err.message || 'Failed to update status');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
     documents,
+    loading,
+    error,
     createDocument,
     deleteDocument,
-    deleteAllSaved,
     setStatus,
-    getFilteredDocuments,
     reload: loadDocuments,
-    deleteAllDocuments,
   };
 } 
