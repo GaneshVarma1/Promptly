@@ -66,7 +66,7 @@ const Header: FC = () => {
               <SignUpButton mode="modal">
                 <Button 
                   size="sm"
-                  className="text-xs sm:text-sm px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-black hover:bg-black text-white backdrop-blur-sm shadow-lg h-8 sm:h-9"
+                  className="text-xs sm:text-sm px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-black hover:bg-gray-800 text-white backdrop-blur-sm shadow-lg h-8 sm:h-9"
                 >
                   <span className="hidden xs:inline">Sign Up</span>
                   <span className="xs:hidden">Join</span>
