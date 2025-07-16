@@ -42,20 +42,7 @@ import { useRouter } from "next/navigation";
 import { useDocuments } from '@/hooks/use-documents';
 import { useUser } from '@clerk/nextjs';
 import { useToast } from '@/hooks/use-toast';
-
-// Add local Template type
-type Template = {
-  id: string;
-  name: string;
-  description: string;
-  domain: string;
-  complexity: string;
-  template: string;
-  metadata: {
-    tags?: string[];
-    updated_at?: string;
-  };
-};
+import { PROMPT_TEMPLATES, PromptTemplate } from '@/lib/prompt-templates';
 
 // Icon mapping for different domains and categories
 const getDomainIcon = (domain: string, category?: string) => {
@@ -104,18 +91,7 @@ export default function PromptGalleryTab() {
   const [sortBy, setSortBy] = useState<'recent' | 'alphabetical'>('alphabetical');
 
   // Get all templates and organize them
-  // This part of the code was removed as per the edit hint.
-  // The original file had AdvancedTemplateLibrary.getAllTemplates() which is no longer imported.
-  // Assuming the intent was to remove the entire import and all usages of AdvancedTemplateLibrary.
-  // However, the edit hint only provided a partial replacement.
-  // To strictly follow the edit hint, I will remove the line AdvancedTemplateLibrary.getAllTemplates()
-  // and replace it with an empty array, as the import is gone.
-  // This will likely cause a runtime error, but I must follow the edit hint.
-  const allTemplates: Template[] = useMemo(() => {
-    // This is a stub to match the main branch.
-    // In a real scenario, this would fetch templates from an API or database.
-    return [];
-  }, []);
+  const allTemplates = useMemo<PromptTemplate[]>(() => PROMPT_TEMPLATES, []);
   // Removed unused categorizedTemplates and libraryStats
 
   // Get unique domains and complexities for filters
@@ -173,7 +149,7 @@ export default function PromptGalleryTab() {
     return filtered;
   }, [allTemplates, searchQuery, selectedDomain, selectedComplexity, sortBy]);
 
-  const handleUseTemplate = async (template: Template) => {
+  const handleUseTemplate = async (template: PromptTemplate) => {
     try {
       if (!user) {
         router.push('/sign-in');
@@ -194,7 +170,7 @@ export default function PromptGalleryTab() {
     }
   };
 
-  const copyTemplateToClipboard = (template: Template) => {
+  const copyTemplateToClipboard = (template: PromptTemplate) => {
     navigator.clipboard.writeText(template.template);
     toast({ description: 'Template copied to clipboard!' });
   };
