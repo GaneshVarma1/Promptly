@@ -5,6 +5,7 @@ import { Search, FileText, Copy, Star, Download } from 'lucide-react';
 import { DashboardSidebar } from '@/components/DashboardSidebar';
 import { useRouter } from 'next/navigation';
 import { useUser } from "@clerk/nextjs";
+import { useDocuments } from '@/hooks/use-documents';
 
 // Sample prompt templates
 const promptTemplates = [
@@ -14,8 +15,7 @@ const promptTemplates = [
     description: "Generate engaging blog posts on any topic",
     prompt: "Write a comprehensive blog post about [TOPIC]. Include an engaging introduction, 3-5 main points with examples, and a compelling conclusion. Target audience: [AUDIENCE]. Tone: [TONE].",
     category: "Content Writing",
-    difficulty: "Beginner",
-    uses: 1250
+    difficulty: "Beginner"
   },
   {
     id: 2,
@@ -23,8 +23,7 @@ const promptTemplates = [
     description: "Review code for best practices and improvements",
     prompt: "Review the following code and provide feedback on:\n1. Code quality and readability\n2. Performance optimizations\n3. Security considerations\n4. Best practices\n5. Specific improvements\n\n```\n[YOUR_CODE]\n```",
     category: "Development",
-    difficulty: "Intermediate",
-    uses: 890
+    difficulty: "Intermediate"
   },
   {
     id: 3,
@@ -32,8 +31,7 @@ const promptTemplates = [
     description: "Create compelling marketing emails",
     prompt: "Create a marketing email for [PRODUCT/SERVICE]. Include:\n- Subject line (A/B test options)\n- Personalized greeting\n- Problem/solution narrative\n- Clear call-to-action\n- Professional closing\nTarget: [AUDIENCE], Goal: [OBJECTIVE]",
     category: "Marketing",
-    difficulty: "Beginner",
-    uses: 650
+    difficulty: "Beginner"
   },
   {
     id: 4,
@@ -41,12 +39,75 @@ const promptTemplates = [
     description: "Analyze data and provide insights",
     prompt: "Analyze the following data and provide insights:\n\n[DATA]\n\nPlease provide:\n1. Key trends and patterns\n2. Statistical summary\n3. Actionable recommendations\n4. Potential next steps\n5. Data visualization suggestions",
     category: "Data Science",
-    difficulty: "Advanced",
-    uses: 420
+    difficulty: "Advanced"
+  },
+  {
+    id: 5,
+    title: "Social Media Manager",
+    description: "Create engaging social media content",
+    prompt: "Create a social media post for [PLATFORM] about [TOPIC]. Include:\n- Engaging headline\n- Relevant hashtags\n- Call-to-action\n- Visual content suggestions\nTarget audience: [AUDIENCE]",
+    category: "Marketing",
+    difficulty: "Beginner"
+  },
+  {
+    id: 6,
+    title: "Product Manager",
+    description: "Develop product strategy and roadmaps",
+    prompt: "Create a product strategy for [PRODUCT/FEATURE]. Include:\n- Market analysis\n- User personas\n- Feature prioritization\n- Success metrics\n- Implementation timeline",
+    category: "Business",
+    difficulty: "Advanced"
+  },
+  {
+    id: 7,
+    title: "Creative Writer",
+    description: "Generate creative stories and content",
+    prompt: "Write a creative story about [THEME/TOPIC]. Include:\n- Compelling characters\n- Engaging plot\n- Vivid descriptions\n- Emotional arc\nStyle: [WRITING_STYLE]",
+    category: "Creative Writing",
+    difficulty: "Intermediate"
+  },
+  {
+    id: 8,
+    title: "Technical Writer",
+    description: "Create technical documentation",
+    prompt: "Write technical documentation for [FEATURE/SYSTEM]. Include:\n- Overview and purpose\n- Step-by-step instructions\n- Code examples\n- Troubleshooting guide\n- Best practices",
+    category: "Development",
+    difficulty: "Intermediate"
+  },
+  {
+    id: 9,
+    title: "Financial Analyst",
+    description: "Analyze financial data and reports",
+    prompt: "Analyze the financial data for [COMPANY/PROJECT]. Include:\n- Key financial metrics\n- Trend analysis\n- Risk assessment\n- Investment recommendations\n- Future projections",
+    category: "Finance",
+    difficulty: "Advanced"
+  },
+  {
+    id: 10,
+    title: "Customer Support",
+    description: "Draft professional customer responses",
+    prompt: "Write a customer support response for [ISSUE]. Include:\n- Empathetic acknowledgment\n- Clear explanation\n- Solution steps\n- Follow-up actions\n- Professional tone",
+    category: "Business",
+    difficulty: "Beginner"
+  },
+  {
+    id: 11,
+    title: "Research Assistant",
+    description: "Conduct comprehensive research",
+    prompt: "Research [TOPIC] and provide:\n- Key findings\n- Relevant sources\n- Analysis summary\n- Recommendations\n- Further research areas",
+    category: "Research",
+    difficulty: "Intermediate"
+  },
+  {
+    id: 12,
+    title: "Legal Assistant",
+    description: "Draft legal documents and contracts",
+    prompt: "Draft a [DOCUMENT_TYPE] for [PURPOSE]. Include:\n- Clear terms and conditions\n- Legal protections\n- Compliance requirements\n- Risk mitigation\n- Professional language",
+    category: "Legal",
+    difficulty: "Advanced"
   }
 ];
 
-const categories = ["All", "Content Writing", "Development", "Marketing", "Data Science"];
+const categories = ["All", "Content Writing", "Development", "Marketing", "Data Science", "Business", "Creative Writing", "Finance", "Research", "Legal"];
 const difficulties = ["All", "Beginner", "Intermediate", "Advanced"];
 
 export default function PromptGalleryPage() {
@@ -55,7 +116,9 @@ export default function PromptGalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
   const [currentTab, setCurrentTab] = useState<'documents' | 'saved' | 'trash' | 'prompt-gallery'>('prompt-gallery');
+  const [loadingTemplate, setLoadingTemplate] = useState<string | null>(null);
   const router = useRouter();
+  const { createDocument } = useDocuments();
 
   // Redirect to home page if user is not authenticated
   useEffect(() => {
@@ -84,6 +147,34 @@ export default function PromptGalleryPage() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     // You could add a toast notification here
+  };
+
+  const handleUseTemplate = async (template: any) => {
+    try {
+      if (!isSignedIn) {
+        router.push('/');
+        return;
+      }
+
+      setLoadingTemplate(template.id.toString());
+
+      // Create a new document with the template
+      const newDocId = await createDocument(
+        `${template.title} - ${new Date().toLocaleDateString()}`,
+        template.prompt
+      );
+
+      if (newDocId) {
+        // Navigate to the new document's results page with id as query param
+        router.push(`/results?id=${newDocId}`);
+      }
+    } catch (error) {
+      console.error('Error using template:', error);
+      // Fallback to copying to clipboard
+      copyToClipboard(template.prompt);
+    } finally {
+      setLoadingTemplate(null);
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -116,11 +207,11 @@ export default function PromptGalleryPage() {
       <main className="flex-1 p-8 ml-64">
         <div className="flex justify-between items-center mb-8">
           <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-sussie">
-          Prompt Gallery
-        </h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight font-sussie">
+              Prompt Templates
+            </h1>
             <p className="text-gray-600 dark:text-zinc-400 mt-1">
-              Ready-to-use prompt templates for various tasks
+              Ready-to-use prompt templates organized by categories
             </p>
           </div>
         </div>
@@ -144,7 +235,7 @@ export default function PromptGalleryPage() {
             className="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             {categories.map(category => (
-              <option key={category} value={category}>{category} Category</option>
+              <option key={category} value={category}>{category}</option>
             ))}
           </select>
 
@@ -154,7 +245,7 @@ export default function PromptGalleryPage() {
             className="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             {difficulties.map(difficulty => (
-              <option key={difficulty} value={difficulty}>{difficulty} Level</option>
+              <option key={difficulty} value={difficulty}>{difficulty}</option>
             ))}
           </select>
         </div>
@@ -177,9 +268,6 @@ export default function PromptGalleryPage() {
                         {template.difficulty}
                       </span>
                     </div>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-zinc-400">
-                    {template.uses} uses
                   </div>
                 </div>
                 
@@ -227,10 +315,18 @@ export default function PromptGalleryPage() {
                   </div>
                   
                   <button 
-                    onClick={() => copyToClipboard(template.prompt)}
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    onClick={() => handleUseTemplate(template)}
+                    disabled={loadingTemplate === template.id.toString()}
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors"
                   >
-                    Use Template
+                    {loadingTemplate === template.id.toString() ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      'Use Template'
+                    )}
                   </button>
                 </div>
               </div>
