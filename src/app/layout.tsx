@@ -187,7 +187,6 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        style={{ backgroundColor: "#020617", colorScheme: "dark" }}
       >
         <head>
           <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
@@ -277,7 +276,13 @@ export default function RootLayout({
             __html: `
               /* Prevent flash of unstyled content */
               html {
-                visibility: hidden;
+                visibility: visible;
+                background-color: #ffffff;
+                transition: all 0.15s ease;
+              }
+              
+              html.dark {
+                background-color: #0f0f23;
               }
               
               html.fonts-loaded {
@@ -296,16 +301,14 @@ export default function RootLayout({
               }
               
               html.dark {
-                --background: 0 0% 0%;
-                --foreground: 0 0% 100%;
-                --card: 0 0% 6%;
-                --card-foreground: 0 0% 100%;
-                --border: 0 0% 20%;
-                --muted: 0 0% 16%;
-                --muted-foreground: 0 0% 60%;
+                --background: 222.2 84% 4.9%;
+                --foreground: 210 40% 98%;
+                --card: 222.2 84% 4.9%;
+                --card-foreground: 210 40% 98%;
+                --border: 217.2 32.6% 17.5%;
+                --muted: 217.2 32.6% 17.5%;
+                --muted-foreground: 215 20.2% 65.1%;
               }
-              
-
             `
           }} />
           <Script
@@ -351,11 +354,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${inter?.variable} ${jetbrainsMono?.variable} antialiased bg-white dark:bg-slate-950 text-foreground font-sussie`}
-          style={{ 
-            backgroundColor: "#020617",
-            fontFamily: 'var(--font-league-spartan)'
-          }}
+          className={`${inter?.variable} ${jetbrainsMono?.variable} antialiased bg-background text-foreground font-sussie`}
         >
           <Suspense fallback={
             <LoadingFallback />
